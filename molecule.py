@@ -6,6 +6,8 @@ import random
 import commands
 import string
 import copy
+import datetime
+import time
 
 class Molecule(object):
 
@@ -59,7 +61,54 @@ class Molecule(object):
             self.x[j] = float(self.x[j]) + delthaX
             self.y[j] = float(self.y[j]) + delthaY
             self.z[j] = float(self.z[j]) + delthaZ
+
+    def translateToPoint(self, point):
+        center = self.findCenter()
+        delta = [point[0]-center[0], point[1]-center[1], point[2]-center[2]]
+        for i in range(len(self.x)):
+            self.x[i] = float(self.x[i]) + delta[0]
+            self.y[i] = float(self.y[i]) + delta[1]
+            self.z[i] = float(self.z[i]) + delta[2]
+
+    def findCenter(self):
+        sumX = 0
+        sumY = 0
+        sumZ = 0
+        for i in range(len(self.x)):
+            sumX += float(self.x[i])
+            sumY += float(self.y[i])
+            sumZ += float(self.z[i])
+        centerX = sumX / len(self.x)
+        centerY = sumY / len(self.y)
+        centerZ = sumZ / len(self.z)
         
+        return [centerX, centerY, centerZ]
+
+    def rotateByVector(self, vector, theta):
+        #vector = self.validateNormCero(vector)
+        originPoint = self.findCenter()
+
+        unitX = vector[0] + originPoint[0]
+        unitY = vector[1] + originPoint[1]
+        unitZ = vector[2] + originPoint[2]
+
+        for j in xrange(len(self.x)):
+            self.x[j] = float(self.x[j]) - originPoint[0]
+            self.y[j] = float(self.y[j]) - originPoint[1]
+            self.z[j] = float(self.z[j]) - originPoint[2]
+
+        p1 = [originPoint[0], originPoint[1], originPoint[2]]
+        p2 = [unitX, unitY, unitZ]
+
+        vectorRef = Vector(p2[0]-p1[0], p2[1]-p1[1], p2[2]-p1[2])
+        matrixRot = calcRotM(vectorRef, theta)
+
+        for i in xrange(len(self.x)):
+            pointRef = [[float(self.x[i])],[float(self.y[i])],[float(self.z[i])]]
+            mresult = crossProduct(matrixRot, pointRef)
+            self.x[i] = mresult[0][0] + originPoint[0]
+            self.y[i] = mresult[1][0] + originPoint[1]
+            self.z[i] = mresult[2][0] + originPoint[2]
 
     def readPDBQT(self, name):
         file = open(name, "r")
@@ -121,9 +170,9 @@ class Molecule(object):
             file.write("{:>5}".format(self.residueName[i]))
             file.write("{:>2}".format(self.chainNAME[i]))
             file.write("{:>4}".format(self.chainId[i]))
-            file.write("{:>12}".format(str(self.x[i])))
-            file.write("{:>8}".format(str(self.y[i])))
-            file.write("{:>8}".format(str(self.z[i])))
+            file.write("{:>12}".format(str(Decimal(self.x[i]).quantize(Decimal('1.000')))))
+            file.write("{:>8}".format(str(Decimal(self.y[i]).quantize(Decimal('1.000')))))
+            file.write("{:>8}".format(str(Decimal(self.z[i]).quantize(Decimal('1.000')))))
             file.write("{:>6}".format(self.occupancy[i]))
             file.write("{:>6}".format(self.tempFactor[i]))
             file.write("{:>10}".format(self.charge[i]))
@@ -171,6 +220,30 @@ class Molecule(object):
         #print "done"
         file.close()
 
+    def generateRandomCenter(self, center):
+        newpoint = center[:]
+        axis = random.randint(0,2)
+        if axis == 0:
+            newpoint[0] = random.uniform(-2,2)+center[0]
+        elif axis == 1:
+            newpoint[1] = random.uniform(-2,2)+center[1]
+        else:
+            newpoint[2] = random.uniform(-2,2)+center[2]
+        self.translateToPoint(newpoint)
+        return newpoint[:]
+
+    def generateRandomRotation(self, vectorRef):
+        alpha = random.randint(0,2)
+        vector = vectorRef[:]
+        if alpha == 0:
+            vector[0] = random.uniform(0,2)*math.pi
+        elif alpha == 1:
+            vector[1] = random.uniform(0,1)*math.pi
+        else:
+            vector[2] = random.uniform(0,2)*math.pi
+        sphVect = spherePoint(1, vector[0], vector[1])
+        self.rotateByVector(sphVect, vector[2])
+        return vector[:]
 
     def generateRandom(self):
         r = random.randint(0,10)
@@ -228,6 +301,17 @@ class Molecule(object):
                         break
             i+=1
 
+    def validateNormCero(self,vector):
+        res = 0.0
+        res += vector[0] * vector[0]
+        res += vector[1] * vector[1]
+        res += vector[2] * vector[2]
+        res = math.sqrt(res)
+
+        if(res<0.2):
+            vector = randomSpherePoint(1)
+        return vector
+
 def calcRotM(vector, theta):
         vector=vector.copy()
         vector.normalize()
@@ -251,6 +335,19 @@ def calcRotM(vector, theta):
 
         return rot
 
+def getRMSD(ligand1, ligand2):
+    dist = 0
+    for i in range(len(ligand1.x)):
+        dist += math.sqrt( (float(ligand1.x[i])-float(ligand2.x[i]))**2 + (float(ligand1.y[i])-float(ligand2.y[i]))**2 + (float(ligand1.z[i])-float(ligand2.z[i]))**2 )
+    rmsd = dist / len(ligand1.x)
+    return rmsd
+
+def spherePoint(radius, theta, phi):
+    xAux = radius * math.cos(theta) * math.sin(phi)
+    yAux = radius * math.sin(theta) * math.sin(phi)
+    zAux = radius * math.cos(phi)
+    return [xAux, yAux, zAux]
+
 def crossProduct(A, B):
     linesA = len(A)
     columnsA = len(A[0])
@@ -271,20 +368,43 @@ def calculateFreeEnergy():
     #print energiaVina
     return float(energiaVina)
 
-ligand = Molecule("NAD")
-ligand.readPDBQT("lig.pdbqt")
-ligand.calculateSegment()
+startTime = datetime.datetime.now()
+
+NADOR = Molecule("NAD")
+NADOR.readPDBQT("lig.pdbqt")
+NADOR.calculateSegment()
+
+ligandOriginal = Molecule("NAD")
+ligandOriginal.readPDBQT("modify.pdbqt")
+ligandOriginal.calculateSegment()
 
 #for seg in ligand.branchSegment:
  #   print seg
 
-print ligand.branch
+print ligandOriginal.branch
 
-ligand.writePDBQT("ligand.pdbqt")
+NADOR.writePDBQT("ligand.pdbqt")
 original_score = calculateFreeEnergy()
 print original_score
 
-#ligand.rotatateBranch(1,4,0,math.pi)
+'''
+sph_theta = random.uniform(0,2)*math.pi
+sph_phi = random.uniform(0,1)*math.pi
+theta = random.uniform(0,2)*math.pi
+sphVect = spherePoint(1, sph_theta, sph_phi)
+ligand = copy.deepcopy(ligandOriginal)
+ligand.rotateByVector(sphVect, theta)
+ligand.writePDBQT("ligrotate.pdbqt")
+'''
+
+spaceCenter = NADOR.findCenter()
+newSearchSpace = [random.uniform(-2,2)+spaceCenter[i] for i in range(3)]
+
+'''
+ligand = copy.deepcopy(ligandOriginal)
+print "originalCenter: ", spaceCenter
+print "alterCenter: ",newSearchSpace
+ligand.translateToPoint([random.uniform(0,20) for i in range(3)])
 ligand.rotatateBranch(1,4,0,random.uniform(0,2*math.pi))
 ligand.rotatateBranch(4,5,1,random.uniform(0,2*math.pi))
 ligand.rotatateBranch(5,6,2,random.uniform(0,2*math.pi))
@@ -296,15 +416,28 @@ ligand.rotatateBranch(27,28,7,random.uniform(0,2*math.pi))
 ligand.rotatateBranch(28,29,8,random.uniform(0,2*math.pi))
 ligand.rotatateBranch(31,36,9,random.uniform(0,2*math.pi))
 ligand.rotatateBranch(38,42,10,random.uniform(0,2*math.pi))
+'''
+sph_theta = random.uniform(0,2)*math.pi
+sph_phi = random.uniform(0,1)*math.pi
+theta = random.uniform(0,2)*math.pi
+#sphVect = spherePoint(1, sph_theta, sph_phi)
+#ligand.rotateByVector(sphVect, theta)
+
+
 
 best_score = 1000.0
-best_ligand = copy.deepcopy(ligand)
+best_ligand = copy.deepcopy(ligandOriginal)
 gen = 0
+new_ligand = copy.deepcopy(ligandOriginal)
+centerspace = newSearchSpace[:]
+vectorRot = [sph_theta, sph_phi, theta]
 
-for i in range(0,10000):
-    if i%100 == 0:
+for i in range(0,5000):
+    if i%10 == 0:
         print "generation: ", i
-    new_ligand = copy.deepcopy(ligand)
+        print "best score: ", best_score
+    centerspace = new_ligand.generateRandomCenter(centerspace)
+    vectorRot = new_ligand.generateRandomRotation(vectorRot)
     new_ligand.generateRandom()
     new_ligand.writePDBQT("ligand.pdbqt")
     new_score = calculateFreeEnergy()
@@ -316,7 +449,16 @@ for i in range(0,10000):
 
 best_ligand.writePDBQT("best.pdbqt")
 print "Best score: ", best_score
-print "Gen: ",gen
+print "Gen: ", gen
+print "RMSD: ", getRMSD(NADOR, best_ligand)
+
+stopTime = datetime.datetime.now()
+print "Time: ", stopTime - startTime
+
+
+
+
+
 
 #print ligand.data
 #ligand.writePDBQT("ligand.pdbqt")
@@ -326,10 +468,7 @@ print "Gen: ",gen
 
 #print ligand.idatm
 #print ligand.root
-'''
-print ligand.idatm
-print ligand.atm
-'''
+
 
 
 
