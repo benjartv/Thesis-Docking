@@ -1,13 +1,11 @@
 import numpy as np
 from vector import *
 from decimal import *
+from utils import *
 import math
 import random
-import commands
-import string
 import copy
 import datetime
-import time
 
 class Molecule(object):
 
@@ -32,7 +30,9 @@ class Molecule(object):
         self.torsdof = 0
         self.data = []
 
-    def rotatateBranch(self, idatm1, idatm2, idbranch, theta):
+    def rotatateBranch(self, idbranch, theta):
+        idatm1 = int(self.branch[idbranch][0])
+        idatm2 = int(self.branch[idbranch][1])
         vect_atom1 = [float(self.x[idatm1-1]), float(self.y[idatm1-1]), float(self.z[idatm1-1])]
         vect_atom2 = [float(self.x[idatm2-1]), float(self.y[idatm2-1]), float(self.z[idatm2-1])]
 
@@ -245,31 +245,12 @@ class Molecule(object):
         self.rotateByVector(sphVect, vector[2])
         return vector[:]
 
-    def generateRandom(self):
-        r = random.randint(0,10)
-        if r == 0:
-            self.rotatateBranch(1,4,0,random.uniform(0,2*math.pi))
-        elif r == 1:
-            self.rotatateBranch(4,5,1,random.uniform(0,2*math.pi))
-        elif r == 2:
-            self.rotatateBranch(5,6,2,random.uniform(0,2*math.pi))
-        elif r == 3:
-            self.rotatateBranch(10,13,3,random.uniform(0,2*math.pi))
-        elif r == 4:
-            self.rotatateBranch(1,23,4,random.uniform(0,2*math.pi))
-        elif r == 5:
-            self.rotatateBranch(23,24,5,random.uniform(0,2*math.pi))
-        elif r == 6:
-            self.rotatateBranch(24,27,6,random.uniform(0,2*math.pi))
-        elif r == 7:
-            self.rotatateBranch(27,28,7,random.uniform(0,2*math.pi))
-        elif r == 8:
-            self.rotatateBranch(28,29,8,random.uniform(0,2*math.pi))
-        elif r == 9:
-            self.rotatateBranch(31,36,9,random.uniform(0,2*math.pi))
-        elif r == 10:
-            self.rotatateBranch(38,42,10,random.uniform(0,2*math.pi))
+    def generateRandomAngles(self):
+        branch = len(self.branch) - 1
+        r = random.randint(0, branch)
+        self.rotatateBranch(r, random.uniform(0,2*math.pi))
 
+   
 
     #Calculate the segment of each branch, save the data on rotationSegment list
     #each position fit with the position of the branch list
@@ -312,162 +293,6 @@ class Molecule(object):
             vector = randomSpherePoint(1)
         return vector
 
-def calcRotM(vector, theta):
-        vector=vector.copy()
-        vector.normalize()
-        c=np.cos(theta)
-        s=np.sin(theta)
-        t=1-c
-        x, y, z=vector.get_array()
-        rot=np.zeros((3, 3))
-        # 1st row
-        rot[0, 0]=t*x*x+c
-        rot[0, 1]=t*x*y-s*z
-        rot[0, 2]=t*x*z+s*y
-        # 2nd row
-        rot[1, 0]=t*x*y+s*z
-        rot[1, 1]=t*y*y+c
-        rot[1, 2]=t*y*z-s*x
-        # 3rd row
-        rot[2, 0]=t*x*z-s*y
-        rot[2, 1]=t*y*z+s*x
-        rot[2, 2]=t*z*z+c
-
-        return rot
-
-def getRMSD(ligand1, ligand2):
-    dist = 0
-    for i in range(len(ligand1.x)):
-        dist += math.sqrt( (float(ligand1.x[i])-float(ligand2.x[i]))**2 + (float(ligand1.y[i])-float(ligand2.y[i]))**2 + (float(ligand1.z[i])-float(ligand2.z[i]))**2 )
-    rmsd = dist / len(ligand1.x)
-    return rmsd
-
-def spherePoint(radius, theta, phi):
-    xAux = radius * math.cos(theta) * math.sin(phi)
-    yAux = radius * math.sin(theta) * math.sin(phi)
-    zAux = radius * math.cos(phi)
-    return [xAux, yAux, zAux]
-
-def crossProduct(A, B):
-    linesA = len(A)
-    columnsA = len(A[0])
-
-    linesB = len(B)
-    columnsB = len(B[0])
-
-    if columnsA == linesB:
-        M = [[sum(A[m][n] * B[n][p] for n in range(columnsA)) \
-              for p in range(columnsB)] for m in range(linesA)]
-        return M
-    else:
-        return -1
-
-def calculateFreeEnergy():
-    a = commands.getstatusoutput('./vina --config config.txt --score_only')
-    energiaVina = string.split(string.split(a[1],"Affinity:")[1])[0]
-    #print energiaVina
-    return float(energiaVina)
-
-startTime = datetime.datetime.now()
-
-NADOR = Molecule("NAD")
-NADOR.readPDBQT("lig.pdbqt")
-NADOR.calculateSegment()
-
-ligandOriginal = Molecule("NAD")
-ligandOriginal.readPDBQT("modify.pdbqt")
-ligandOriginal.calculateSegment()
-
-#for seg in ligand.branchSegment:
- #   print seg
-
-print ligandOriginal.branch
-
-NADOR.writePDBQT("ligand.pdbqt")
-original_score = calculateFreeEnergy()
-print original_score
-
-'''
-sph_theta = random.uniform(0,2)*math.pi
-sph_phi = random.uniform(0,1)*math.pi
-theta = random.uniform(0,2)*math.pi
-sphVect = spherePoint(1, sph_theta, sph_phi)
-ligand = copy.deepcopy(ligandOriginal)
-ligand.rotateByVector(sphVect, theta)
-ligand.writePDBQT("ligrotate.pdbqt")
-'''
-
-spaceCenter = NADOR.findCenter()
-newSearchSpace = [random.uniform(-2,2)+spaceCenter[i] for i in range(3)]
-
-'''
-ligand = copy.deepcopy(ligandOriginal)
-print "originalCenter: ", spaceCenter
-print "alterCenter: ",newSearchSpace
-ligand.translateToPoint([random.uniform(0,20) for i in range(3)])
-ligand.rotatateBranch(1,4,0,random.uniform(0,2*math.pi))
-ligand.rotatateBranch(4,5,1,random.uniform(0,2*math.pi))
-ligand.rotatateBranch(5,6,2,random.uniform(0,2*math.pi))
-ligand.rotatateBranch(10,13,3,random.uniform(0,2*math.pi))
-ligand.rotatateBranch(1,23,4,random.uniform(0,2*math.pi))
-ligand.rotatateBranch(23,24,5,random.uniform(0,2*math.pi))
-ligand.rotatateBranch(24,27,6,random.uniform(0,2*math.pi))
-ligand.rotatateBranch(27,28,7,random.uniform(0,2*math.pi))
-ligand.rotatateBranch(28,29,8,random.uniform(0,2*math.pi))
-ligand.rotatateBranch(31,36,9,random.uniform(0,2*math.pi))
-ligand.rotatateBranch(38,42,10,random.uniform(0,2*math.pi))
-'''
-sph_theta = random.uniform(0,2)*math.pi
-sph_phi = random.uniform(0,1)*math.pi
-theta = random.uniform(0,2)*math.pi
-#sphVect = spherePoint(1, sph_theta, sph_phi)
-#ligand.rotateByVector(sphVect, theta)
-
-
-
-best_score = 1000.0
-best_ligand = copy.deepcopy(ligandOriginal)
-gen = 0
-new_ligand = copy.deepcopy(ligandOriginal)
-centerspace = newSearchSpace[:]
-vectorRot = [sph_theta, sph_phi, theta]
-
-for i in range(0,5000):
-    if i%10 == 0:
-        print "generation: ", i
-        print "best score: ", best_score
-    centerspace = new_ligand.generateRandomCenter(centerspace)
-    vectorRot = new_ligand.generateRandomRotation(vectorRot)
-    new_ligand.generateRandom()
-    new_ligand.writePDBQT("ligand.pdbqt")
-    new_score = calculateFreeEnergy()
-    if new_score < best_score:
-        best_score = new_score
-        best_ligand = copy.deepcopy(new_ligand)
-        gen = i
-
-
-best_ligand.writePDBQT("best.pdbqt")
-print "Best score: ", best_score
-print "Gen: ", gen
-print "RMSD: ", getRMSD(NADOR, best_ligand)
-
-stopTime = datetime.datetime.now()
-print "Time: ", stopTime - startTime
-
-
-
-
-
-
-#print ligand.data
-#ligand.writePDBQT("ligand.pdbqt")
-#print ligand.torsdof
-#print ligand.branch[7]
-#print ligand.branchSegment[7]
-
-#print ligand.idatm
-#print ligand.root
 
 
 
