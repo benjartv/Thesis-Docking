@@ -30,7 +30,7 @@ class Molecule(object):
         self.torsdof = 0
         self.data = []
 
-    def rotatateBranch(self, idbranch, theta):
+    def rotateAtomsBranch(self, idbranch, theta):
         idatm1 = int(self.branch[idbranch][0])
         idatm2 = int(self.branch[idbranch][1])
         vect_atom1 = [float(self.x[idatm1-1]), float(self.y[idatm1-1]), float(self.z[idatm1-1])]
@@ -248,7 +248,7 @@ class Molecule(object):
     def generateRandomAngles(self):
         branch = len(self.branch) - 1
         r = random.randint(0, branch)
-        self.rotatateBranch(r, random.uniform(0,2*math.pi))
+        self.rotateAtomsBranch(r, random.uniform(0,2*math.pi))
 
    
 

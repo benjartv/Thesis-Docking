@@ -15,6 +15,7 @@ class LocalSearch(object):
 		self.__typeLS = typeLS
 		self.__numIteration = numIteration
 		self.__numberScoring = 0
+		self.__temporalDir = "temp/"
 
 	def initLocalSearch(self, cell):
 		#print "Init Local Search..."
@@ -56,8 +57,8 @@ class LocalSearch(object):
 		sphVect = spherePoint(1, cell.sph_theta, cell.sph_phi)
 		auxLigand.rotateByVector(sphVect, cell.theta)
 		for i in range(len(auxLigand.branch)):
-			auxLigand.rotatateBranch(i, cell.rotateBranch[i])
-		auxLigand.writePDBQT("ligand.pdbqt")
+			auxLigand.rotateAtomsBranch(i, cell.rotateBonds[i])
+		auxLigand.writePDBQT(self.__temporalDir+"ligand.pdbqt")
 		cell.score = calculateFreeEnergy()
 		self.__numberScoring += 1
 		return copy.deepcopy(cell)
@@ -78,7 +79,7 @@ class LocalSearch(object):
 			cell.theta = random.uniform(0,2)*math.pi
 		elif select == 7:
 			pos = random.randint(0, len(self.__ligand.branch)-1)
-			cell.rotateBranch[pos] = random.uniform(0,2)*math.pi
+			cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 		return copy.deepcopy(cell)
 
 	def getNumberEvaluation(self):

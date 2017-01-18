@@ -34,7 +34,7 @@ class agent(object):
 		sphVect = spherePoint(1, cell.sph_theta, cell.sph_phi)
 		auxLigand.rotateByVector(sphVect, cell.theta)
 		for i in range(len(auxLigand.branch)):
-			auxLigand.rotatateBranch(i, cell.rotateBranch[i])
+			auxLigand.rotateAtomsBranch(i, cell.rotateBonds[i])
 		return copy.deepcopy(auxLigand)
 
 	def calculateDistance(self, cell1, cell2):

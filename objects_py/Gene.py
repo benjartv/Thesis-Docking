@@ -12,7 +12,7 @@ class Gene:
         self.sph_theta = 0.0
         self.sph_phi = 0.0
         self.theta = 0.0
-        self.rotateBranch = []
+        self.rotateBonds = []
         self.score = 0.0
 
     def randomCell(self, rotateBond, searchSpace):
@@ -24,4 +24,4 @@ class Gene:
     	self.theta = random.uniform(0,2)*math.pi
     	for i in range(rotateBond):
     		angle = random.uniform(0,2)*math.pi
-    		self.rotateBranch.append(angle)
+    		self.rotateBonds.append(angle)

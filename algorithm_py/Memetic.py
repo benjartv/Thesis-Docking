@@ -115,7 +115,7 @@ class Memetic(object):
 		sphVect = spherePoint(1, newcell.sph_theta, newcell.sph_phi)
 		auxLigand.rotateByVector(sphVect, newcell.theta)
 		for i in range(len(auxLigand.branch)):
-			auxLigand.rotatateBranch(i, newcell.rotateBranch[i])
+			auxLigand.rotateAtomsBranch(i, newcell.rotateBonds[i])
 		auxLigand.writePDBQT(self.__temporalDir+"ligand.pdbqt")
 		newcell.score = calculateFreeEnergy()
 		self.__numberScoring += 1
@@ -129,7 +129,7 @@ class Memetic(object):
 		sphVect = spherePoint(1, cell.sph_theta, cell.sph_phi)
 		auxLigand.rotateByVector(sphVect, cell.theta)
 		for i in range(len(auxLigand.branch)):
-			auxLigand.rotatateBranch(i, cell.rotateBranch[i])
+			auxLigand.rotateAtomsBranch(i, cell.rotateBonds[i])
 		return copy.deepcopy(auxLigand)
 
 	def generateFinalBest(self, cell, name="best-ligand.pdbqt"):
@@ -140,7 +140,7 @@ class Memetic(object):
 		sphVect = spherePoint(1, cell.sph_theta, cell.sph_phi)
 		auxLigand.rotateByVector(sphVect, cell.theta)
 		for i in range(len(auxLigand.branch)):
-			auxLigand.rotatateBranch(i, cell.rotateBranch[i])
+			auxLigand.rotateAtomsBranch(i, cell.rotateBonds[i])
 		auxLigand.writePDBQT(name)
 
 	def generation(self):
@@ -197,11 +197,150 @@ class Memetic(object):
 			newCell.theta = selectedCell1.theta
 		else:
 			newCell.theta = selectedCell2.theta
-		for i in range(len(selectedCell1.rotateBranch)):
+		for i in range(len(selectedCell1.rotateBonds)):
 			if random.randint(0,1)==1:
-				newCell.rotateBranch.append(selectedCell1.rotateBranch[i])
+				newCell.rotateBonds.append(selectedCell1.rotateBonds[i])
 			else:
-				newCell.rotateBranch.append(selectedCell2.rotateBranch[i])
+				newCell.rotateBonds.append(selectedCell2.rotateBonds[i])
+		return newCell
+
+	def crossoverBlock(self, selectedCell1, selectedCell2):
+		newCell = Gene()
+		if random.randint(0,1) == 1:
+			newCell.x = selectedCell1.x
+			newCell.y = selectedCell1.y
+			newCell.z = selectedCell1.z
+		else:
+			newCell.x = selectedCell2.x
+			newCell.y = selectedCell2.y
+			newCell.z = selectedCell2.z
+		if random.randint(0,1) == 1:
+			newCell.sph_theta = selectedCell1.sph_theta
+			newCell.sph_phi = selectedCell1.sph_phi
+			newCell.theta = selectedCell1.theta
+		else:
+			newCell.sph_theta = selectedCell2.sph_theta
+			newCell.sph_phi = selectedCell2.sph_phi
+			newCell.theta = selectedCell2.theta
+		if random.randint(0,1) == 1:
+			newcell.rotateBonds = selectedCell1.rotateBonds[:]
+		else:
+			newCell.rotateBonds = selectedCell2.rotateBonds[:]
+		return newCell
+
+	def crossover50(self, selectedCell1, selectedCell2):
+		newCell = Gene()
+		#switch center of ligand
+		centrand = random.randint(0,5)
+		if centrand == 0:
+			newCell.x = selectedCell1.x
+			newCell.y = selectedCell2.y
+			newCell.z = selectedCell2.z
+		elif centrand == 1:
+			newCell.x = selectedCell1.x
+			newCell.y = selectedCell1.y
+			newCell.z = selectedCell2.z
+		elif centrand == 2:
+			newCell.x = selectedCell1.x
+			newCell.y = selectedCell1.y
+			newCell.z = selectedCell1.z
+		elif centrand == 3:
+			newCell.x = selectedCell2.x
+			newCell.y = selectedCell2.y
+			newCell.z = selectedCell2.z
+		elif centrand == 4:
+			newCell.x = selectedCell2.x
+			newCell.y = selectedCell1.y
+			newCell.z = selectedCell1.z
+		else:
+			newCell.x = selectedCell2.x
+			newCell.y = selectedCell2.y
+			newCell.z = selectedCell1.z
+		#switch rotation of ligand
+		rotrand = random.randint(0,5)
+		if rotrand == 0:
+			newCell.sph_theta = selectedCell1.sph_theta
+			newCell.sph_phi = selectedCell2.sph_phi
+			newCell.theta = selectedCell2.theta
+		elif rotrand == 1:
+			newCell.sph_theta = selectedCell1.sph_theta
+			newCell.sph_phi = selectedCell1.sph_phi
+			newCell.theta = selectedCell2.theta
+		elif rotrand == 2:
+			newCell.sph_theta = selectedCell1.sph_theta
+			newCell.sph_phi = selectedCell1.sph_phi
+			newCell.theta = selectedCell1.theta
+		elif rotrand == 3:
+			newCell.sph_theta = selectedCell2.sph_theta
+			newCell.sph_phi = selectedCell2.sph_phi
+			newCell.theta = selectedCell2.theta
+		elif rotrand == 4:
+			newCell.sph_theta = selectedCell2.sph_theta
+			newCell.sph_phi = selectedCell1.sph_phi
+			newCell.theta = selectedCell1.theta
+		else:
+			newCell.sph_theta = selectedCell2.sph_theta
+			newCell.sph_phi = selectedCell2.sph_phi
+			newCell.theta = selectedCell1.theta
+		#switch rotational bonds
+		bondrand = random.randint(0, (len(selectedCell1.rotateBonds)-1))
+		if random.randint(0,1) == 1:
+			newCell.rotateBonds = selectedCell1.rotateBonds[:bondrand]+selectedCell2.rotateBonds[bondrand:]
+		else:
+			newCell.rotateBonds = selectedCell2.rotateBonds[:bondrand]+selectedCell1.rotateBonds[bondrand:]
+		return newCell
+
+	def crossoverSPC(self, selectedCell1, selectedCell2):
+		pop1 = []
+		pop2 = []
+
+		pop1.append(selectedCell1.x)
+		pop1.append(selectedCell1.y)
+		pop1.append(selectedCell1.z)
+		pop1.append(selectedCell1.sph_theta)
+		pop1.append(selectedCell1.sph_phi)
+		pop1.append(selectedCell1.theta)
+
+		for angle in selectedCell1.rotateBonds:
+			pop1.append(angle)
+
+		pop2.append(selectedCell2.x)
+		pop2.append(selectedCell2.y)
+		pop2.append(selectedCell2.z)
+		pop2.append(selectedCell2.sph_theta)
+		pop2.append(selectedCell2.sph_phi)
+		pop2.append(selectedCell2.theta)
+
+		for angle in selectedCell2.rotateBonds:
+			pop2.append(angle)
+
+		genSize = len(pop1)
+		cutPoint = random.randint(0, genSize-1)
+		length = random.randint(0, genSize-1)
+		if length == 0:
+			return selectedCell1
+		elif length > (genSize - cutPoint):
+			newPop = pop1[cutPoint:]
+			turnTop = length - (genSize-cutPoint)
+			for i in range(0, turnTop):
+				newPop.insert(i, pop1[i])
+			for i in range(turnTop, cutPoint):
+				newPop.insert(i, pop2[i])
+		else:
+			newPop = pop1[cutPoint:cutPoint+length]
+			for i in range(0, cutPoint):
+				newPop.insert(i, pop2[i])
+			for i in range(cutPoint+length, genSize):
+				newPop.insert(i, pop2[i])
+
+		newCell = Gene()
+		newCell.x = newPop[0]
+		newCell.y = newPop[1]
+		newCell.z = newPop[2]
+		newCell.sph_theta = newPop[3]
+		newCell.sph_phi = newPop[4]
+		newCell.theta = newPop[5]
+		newCell.rotateBonds = newPop[6:]
 		return newCell
 
 	def initLog(self):
@@ -225,7 +364,7 @@ class Memetic(object):
 												self.__rootNode.pocket[i].sph_theta,
 												self.__rootNode.pocket[i].sph_phi,
 												self.__rootNode.pocket[i].theta,
-												self.__rootNode.pocket[i].rotateBranch])
+												self.__rootNode.pocket[i].rotateBonds])
 				self.__logPop += "score: "+str(self.__rootNode.pocket[i].score)+"\n"
 		self.__logPop += "\n"
 		for j in range(len(self.__fatherNode)):
@@ -240,7 +379,7 @@ class Memetic(object):
 													self.__fatherNode[j].pocket[i].sph_theta,
 													self.__fatherNode[j].pocket[i].sph_phi,
 													self.__fatherNode[j].pocket[i].theta,
-													self.__fatherNode[j].pocket[i].rotateBranch])
+													self.__fatherNode[j].pocket[i].rotateBonds])
 					self.__logPop += "score: "+str(self.__fatherNode[j].pocket[i].score)+"\n"
 			node += 1
 			self.__logPop += "\n"
@@ -256,7 +395,7 @@ class Memetic(object):
 													self.__leafNode[j].pocket[i].sph_theta,
 													self.__leafNode[j].pocket[i].sph_phi,
 													self.__leafNode[j].pocket[i].theta,
-													self.__leafNode[j].pocket[i].rotateBranch])
+													self.__leafNode[j].pocket[i].rotateBonds])
 					self.__logPop += "score: "+str(self.__leafNode[j].pocket[i].score)+"\n"
 			node += 1
 			self.__logPop += "\n"
@@ -275,7 +414,7 @@ class Memetic(object):
 												self.__rootNode.pocket[i].sph_theta,
 												self.__rootNode.pocket[i].sph_phi,
 												self.__rootNode.pocket[i].theta,
-												self.__rootNode.pocket[i].rotateBranch])
+												self.__rootNode.pocket[i].rotateBonds])
 				self.__logPop += "score: "+str(self.__rootNode.pocket[i].score)+"\n"
 		self.__logPop += "\n"
 		for j in range(len(self.__fatherNode)):
@@ -290,7 +429,7 @@ class Memetic(object):
 													self.__fatherNode[j].pocket[i].sph_theta,
 													self.__fatherNode[j].pocket[i].sph_phi,
 													self.__fatherNode[j].pocket[i].theta,
-													self.__fatherNode[j].pocket[i].rotateBranch])
+													self.__fatherNode[j].pocket[i].rotateBonds])
 					self.__logPop += "score: "+str(self.__fatherNode[j].pocket[i].score)+"\n"
 			node += 1
 			self.__logPop += "\n"
@@ -306,7 +445,7 @@ class Memetic(object):
 													self.__leafNode[j].pocket[i].sph_theta,
 													self.__leafNode[j].pocket[i].sph_phi,
 													self.__leafNode[j].pocket[i].theta,
-													self.__leafNode[j].pocket[i].rotateBranch])
+													self.__leafNode[j].pocket[i].rotateBonds])
 					self.__logPop += "score: "+str(self.__leafNode[j].pocket[i].score)+"\n"
 			node += 1
 			self.__logPop += "\n"
@@ -333,7 +472,7 @@ class Memetic(object):
 				cell.theta = random.uniform(0,2)*math.pi
 			elif select == 7:
 				pos = random.randint(0, len(self.__ligand.branch)-1)
-				cell.rotateBranch[pos] = random.uniform(0,2)*math.pi
+				cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 		return cell
 
 

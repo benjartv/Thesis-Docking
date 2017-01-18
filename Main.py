@@ -17,7 +17,7 @@ if __name__ == "__main__":
 	spaceCenter = NADOR.findCenter()
 	__searchSpace = 2
 	newSearchSpace = [random.uniform(-__searchSpace,__searchSpace)+spaceCenter[i] for i in range(3)]
-	__generations = 2
+	__generations = 10
 	__pocketSize = 5
 	__treeNodes = 13
 	__mutProbability = 0.2
