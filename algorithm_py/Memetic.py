@@ -26,9 +26,12 @@ class Memetic(object):
 		self.__fatherNode = [None]*self.__nodeByTree
 		self.__leafNode = [None]*self.__nodeByTree*len(self.__fatherNode)
 		self.__logPop = ""
+		self.__logData = ""
 		self.__numberScoring = 0
 		self.__dirResult = ""
 		self.__temporalDir = "temp/"
+		self.__bestScore = 9999.9
+		self.__bestGeneration = 0
 
 		if self.__isLocalSearch:
 			self.__LocalSearch = LocalSearch(params.tempLS,
@@ -48,16 +51,17 @@ class Memetic(object):
 		self.initTree()
 		self.initPopulation()
 		for i in range(self.__generations):
-			print "Generation: ", i, " Best: ", self.__rootNode.getBest().score
+			bestNode = self.__rootNode.getBest().score
+			self.updateBest(bestNode, i)
+			print "Generation: ", i, " Best: ", bestNode
 			self.generation()
 			self.addlogPopulation(i)
 			print "Root: ", self.__rootNode.getPocketScore()
 		bestCell = self.__rootNode.getBest()
 		print "Best ligand score: ", bestCell.score
 		auxLigand = self.generateLigand(bestCell)
-		print "RMSD: ", getRMSD(auxLigand, self.__originalLigand)
-		
-		
+		auxRMSD = getRMSD(auxLigand, self.__originalLigand)
+		print "RMSD: ", auxRMSD
 		for i in range(self.__pocketSize):
 			if self.__rootNode.pocket[i] != None:
 				self.generateFinalBest(self.__rootNode.pocket[i], self.__dirResult+"/"+"best-lig-"+str(i)+".pdbqt")
@@ -67,6 +71,15 @@ class Memetic(object):
 		if self.__isLocalSearch:
 			self.__numberScoring += self.__LocalSearch.getNumberEvaluation()
 		print "Number of Energy Evaluation: ", self.__numberScoring
+
+		######### Add log info #########
+
+		self.__logData += "Best ligand score: "+str(self.__bestScore)+"\n"
+		self.__logData += "Generation: "+str(self.__bestGeneration)+"\n"
+		self.__logData += "RMSD: "+ str(auxRMSD)+"\n"
+		self.__logData += "Time: "+ str(self.__Time)+"\n"
+		self.__logData += "Number of Energy Evaluation: "+ str(self.__numberScoring)+"\n"
+
 		print "Process complete"
 		self.writeLog()
 
@@ -102,6 +115,11 @@ class Memetic(object):
 			gene = self.calculates(gene)
 			self.__leafNode[n].addToPocket(copy.deepcopy(gene))
 		self.initLog()
+
+	def updateBest(self, score, generation):
+		if score < self.__bestScore:
+			self.__bestScore = score
+			self.__bestGeneration = generation
 
 	def calculates(self, cell):
 		if self.__isLocalSearch:
@@ -345,10 +363,10 @@ class Memetic(object):
 
 	def initLog(self):
 		node = 1
-		self.__logPop += "Molecule Ligand: "+self.__ligand.recordName+"\n"
-		self.__logPop += "Pocket: "+str(self.__pocketSize)+"\n"
-		self.__logPop += "Generations: "+str(self.__generations)+"\n"
-		self.__logPop += "Rotate bonds: "+str(self.__ligand.branch)+"\n"
+		self.__logData += "Molecule Ligand: "+self.__ligand.recordName+"\n"
+		self.__logData += "Pocket: "+str(self.__pocketSize)+"\n"
+		self.__logData += "Generations: "+str(self.__generations)+"\n"
+		self.__logData += "Rotate bonds: "+str(self.__ligand.branch)+"\n"
 		self.__logPop += "\n"
 		#self.__logPop += "Best Score: "+str(self.__rootNode.getBest().score)+"\n"
 		self.__logPop += "\n"
@@ -452,7 +470,8 @@ class Memetic(object):
 
 	def writeLog(self):
 		file = open(self.__dirResult+"/iteration.log", "w")
-		file.write(self.__logPop)
+		logWrite = self.__logData+self.__logPop
+		file.write(logWrite)
 		file.close()
 
 	def mutation(self, cell):
