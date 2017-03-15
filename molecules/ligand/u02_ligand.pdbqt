@@ -1,20 +1,3 @@
-REMARK  13 active torsions:
-REMARK  status: ('A' for Active; 'I' for Inactive)
-REMARK    1  A    between atoms: CZ5_1522  and  OZ5_1523 
-REMARK    2  A    between atoms: OZ5_1523  and  CZ4_1524 
-REMARK       I    between atoms: CZ4_1524  and  NZ3_1526 
-REMARK    3  A    between atoms: NZ3_1526  and  CZ3_1527 
-REMARK    4  A    between atoms: CZ3_1527  and  CZ2_1528 
-REMARK    5  A    between atoms: CZ2_1528  and  CZ1_1529 
-REMARK       I    between atoms: CZ1_1529  and  NZ1_1531 
-REMARK    6  A    between atoms: NZ1_1531  and  CB5_1532 
-REMARK    7  A    between atoms: CB1_1536  and  CG1_1538 
-REMARK    8  A    between atoms: CG1_1538  and  CG2_1539 
-REMARK    9  A    between atoms: CG1_1538  and  CA_1542 
-REMARK   10  A    between atoms: CA4_1546  and  CD_1550 
-REMARK   11  A    between atoms: CD_1550  and  CD1_1551 
-REMARK   12  A    between atoms: CD_1550  and  CE_1553 
-REMARK   13  A    between atoms: CE_1553  and  CE1_1554 
 ROOT
 HETATM    1  CZ8 U02 A 100       4.014  25.480   1.328  1.00 52.80     0.030 C 
 HETATM    2  CZ7 U02 A 100       5.323  24.029   2.861  1.00 39.90     0.030 C 

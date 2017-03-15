@@ -32,6 +32,11 @@ class Memetic(object):
 		self.__temporalDir = "temp/"
 		self.__bestScore = 9999.9
 		self.__bestGeneration = 0
+		self.__isReset = False
+		self.__rCount = 0
+		self.__reset = params.reset
+		if self.__reset != -1:
+			self.__isReset = True
 
 		if self.__isLocalSearch:
 			self.__LocalSearch = LocalSearch(params.tempLS,
@@ -51,10 +56,12 @@ class Memetic(object):
 		self.initTree()
 		self.initPopulation()
 		for i in range(self.__generations):
+			self.generation()
 			bestNode = self.__rootNode.getBest().score
 			self.updateBest(bestNode, i)
+			if self.__isReset:
+				self.resetCount(i)
 			print "Generation: ", i, " Best: ", bestNode
-			self.generation()
 			self.addlogPopulation(i)
 			print "Root: ", self.__rootNode.getPocketScore()
 		bestCell = self.__rootNode.getBest()
@@ -75,7 +82,7 @@ class Memetic(object):
 		######### Add log info #########
 
 		self.__logData += "Best ligand score: "+str(self.__bestScore)+"\n"
-		self.__logData += "Generation: "+str(self.__bestGeneration)+"\n"
+		self.__logData += "Reached on generation: "+str(self.__bestGeneration)+"\n"
 		self.__logData += "RMSD: "+ str(auxRMSD)+"\n"
 		self.__logData += "Time: "+ str(self.__Time)+"\n"
 		self.__logData += "Number of Energy Evaluation: "+ str(self.__numberScoring)+"\n"
@@ -473,6 +480,44 @@ class Memetic(object):
 		logWrite = self.__logData+self.__logPop
 		file.write(logWrite)
 		file.close()
+
+	def resetCount(self, gen):
+		if gen > self.__bestGeneration:
+			self.__rCount += 1
+			if self.__rCount == self.__reset:
+				print "reset population..."
+				#reset population
+				self.resetPopulation()
+				self.__rCount = 0
+		else:
+			self.__rCount == 0
+
+	def resetPopulation(self):
+		for node in self.__leafNode:
+			bestCell = node.getBest()
+			node.resetAgent()
+			node.addToPocket(bestCell)
+		for node in self.__fatherNode:
+			bestCell = node.getBest()
+			node.resetAgent()
+			node.addToPocket(bestCell)
+		bestCell = self.__rootNode.getBest()
+		self.__rootNode.resetAgent()
+		self.__rootNode.addToPocket(bestCell)
+		#gene = Gene()
+		#gene.randomCell(len(self.__ligand.branchSegment), self.__searchSpace)
+		#gene = self.calculates(gene)
+		#self.__rootNode.addToPocket(copy.deepcopy(gene))
+		for n in range(len(self.__fatherNode)):
+			gene = Gene()
+			gene.randomCell(len(self.__ligand.branchSegment), self.__searchSpace)
+			gene = self.calculates(gene)
+			self.__fatherNode[n].addToPocket(copy.deepcopy(gene))
+		for n in range(len(self.__leafNode)):
+			gene = Gene()
+			gene.randomCell(len(self.__ligand.branchSegment), self.__searchSpace)
+			gene = self.calculates(gene)
+			self.__leafNode[n].addToPocket(copy.deepcopy(gene))
 
 	def mutation(self, cell):
 		if random.randint(0,1) <= self.__mutProbability:

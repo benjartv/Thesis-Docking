@@ -1,4 +1,4 @@
-receptor = protein.pdbqt
+receptor = temp/protein.pdbqt
 ligand = temp/ligand.pdbqt
 center_x = 2.815
 center_y = -3.57

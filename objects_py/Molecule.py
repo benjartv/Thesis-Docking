@@ -6,6 +6,8 @@ import math
 import random
 import copy
 import datetime
+import os
+import sys
 
 class Molecule(object):
 
@@ -111,35 +113,17 @@ class Molecule(object):
             self.z[i] = mresult[2][0] + originPoint[2]
 
     def readPDBQT(self, name):
-        file = open(name, "r")
-        data = file.readlines()
-        file.close()
-        content = []
-        for line in data:
-            content.append(line.strip().split())
-        i = 1
-        while True:
-            if content[i][0] == "ENDROOT":
-                break
-            self.idatm.append(content[i][1])
-            self.atm.append(content[i][2])
-            self.residueName.append(content[i][3])
-            self.chainNAME.append(content[i][4])
-            self.chainId.append(content[i][5])
-            self.x.append(content[i][6])
-            self.y.append(content[i][7])
-            self.z.append(content[i][8])
-            self.occupancy.append(content[i][9])
-            self.tempFactor.append(content[i][10])
-            self.charge.append(content[i][11])
-            self.atmType.append(content[i][12])
-            self.root.append(content[i][1])
-            i+=1
-        while content[i][0] != "TORSDOF":
-            if content[i][0] == "BRANCH":
-                self.branch.append([content[i][1],content[i][2]])
-                self.data.append(["B",content[i][1],content[i][2]])
-            elif content[i][0] == "HETATM":
+        if os.path.isfile(name):  
+            file = open(name, "r")
+            data = file.readlines()
+            file.close()
+            content = []
+            for line in data:
+                content.append(line.strip().split())
+            i = 1
+            while True:
+                if content[i][0] == "ENDROOT":
+                    break
                 self.idatm.append(content[i][1])
                 self.atm.append(content[i][2])
                 self.residueName.append(content[i][3])
@@ -152,12 +136,34 @@ class Molecule(object):
                 self.tempFactor.append(content[i][10])
                 self.charge.append(content[i][11])
                 self.atmType.append(content[i][12])
-                self.data.append(["H",content[i][1]])
-                #self.root.append(content[i][1])
-            elif content[i][0] == "ENDBRANCH":
-                self.data.append(["E",content[i][1], content[i][2]])
-            i+=1
-        self.torsdof = content[i][1]
+                self.root.append(content[i][1])
+                i+=1
+            while content[i][0] != "TORSDOF":
+                if content[i][0] == "BRANCH":
+                    self.branch.append([content[i][1],content[i][2]])
+                    self.data.append(["B",content[i][1],content[i][2]])
+                elif content[i][0] == "HETATM":
+                    self.idatm.append(content[i][1])
+                    self.atm.append(content[i][2])
+                    self.residueName.append(content[i][3])
+                    self.chainNAME.append(content[i][4])
+                    self.chainId.append(content[i][5])
+                    self.x.append(content[i][6])
+                    self.y.append(content[i][7])
+                    self.z.append(content[i][8])
+                    self.occupancy.append(content[i][9])
+                    self.tempFactor.append(content[i][10])
+                    self.charge.append(content[i][11])
+                    self.atmType.append(content[i][12])
+                    self.data.append(["H",content[i][1]])
+                    #self.root.append(content[i][1])
+                elif content[i][0] == "ENDBRANCH":
+                    self.data.append(["E",content[i][1], content[i][2]])
+                i+=1
+            self.torsdof = content[i][1]
+        else:
+            print "ERROR: ligand file not found."
+            sys.exit(2)
 
     def writePDBQT(self, name):
         file = open(name, 'w')

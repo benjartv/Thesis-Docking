@@ -3,6 +3,10 @@ import numpy as np
 import math
 import commands
 import string
+import sys
+import getopt
+import os
+import shutil
 
 def calcRotM(vector, theta):
         vector=vector.copy()
@@ -72,5 +76,91 @@ def convertTime(time):
         newTime += i
     newTime = newTime.strip("-")
     return newTime
+
+def initConfig():
+    ligand = ""
+    protein = ""
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'l:p:h', ['ligand=', 'protein=', 'help'])
+        if not opts:
+          print ' Missing parameters'
+          usage()
+          sys.exit(2)
+    except getopt.GetoptError:
+        usage()
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt in ('-h', '--help'):
+            usage()
+            sys.exit(2)
+        elif opt in ('-l', '--ligand'):
+            ligand = arg
+        elif opt in ('-p', '--protein'):
+            protein = arg
+        else:
+            usage()
+            sys.exit(2)
+    return [ligand, protein]
+
+def setPathLig(name):
+    path = "molecules/ligand/"+name.lower()+"_ligand.pdbqt"
+    return path
+
+def setPathMLig(name):
+    path = "molecules/m-ligand/"+name.lower()+"-modify.pdbqt"
+    return path
+
+def impProtein(name):
+    shutil.copy2("molecules/protein/"+name.upper()+".pdbqt", "temp/protein.pdbqt")
+
+def cleanTemp():
+    os.remove("temp/ligand.pdbqt")
+    os.remove("temp/protein.pdbqt")
+
+def usage():
+    print "\n Memetic algorithm for Molecular Docking"
+    print " -l: ligand name\n -p: complex name"
+    print "\t -l    -p"
+    print "\t NAD - 1ENY"
+    print "\t KNI - 1HPX"
+    print "\t NMB - 1AJV"
+    print "\t U02 - 2UPJ"
+    print "\t XV6 - 1BV9\n"
+
+
+def configParameters(name):
+    params = open("ligands-config.txt", "r")
+    content = params.readlines()
+    params.close()
+    flag = 0
+    data = []
+    for line in content:
+        lig = line.strip().split("_")
+        lig[1] = lig[1].split(";")
+        data.append(lig)
+    for ligand in data:
+        if name == ligand[0]: 
+            center_x = ligand[1][0]
+            center_y = ligand[1][1]
+            center_z = ligand[1][2]
+            flag = 1
+            break
+    if flag == 1:
+        dataW = "receptor = temp/protein.pdbqt\n"
+        dataW += "ligand = temp/ligand.pdbqt\n"
+        dataW += "center_x = "+str(center_x)+"\n"
+        dataW += "center_y = "+str(center_y)+"\n"
+        dataW += "center_z = "+str(center_z)+"\n"
+        dataW += "size_x = 20.0\nsize_y = 20.0\nsize_z = 20.0\n"
+        dataW += "out = result.pdbqt"
+        configFile = open("energy/config.txt", "w")
+        configFile.write(dataW)
+        configFile.close()
+    else:
+        print "ERROR: no config parameters for ligand", name
+        exit(2)
+
+
 
 

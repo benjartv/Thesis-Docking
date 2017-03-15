@@ -14,7 +14,8 @@ class params(object):
 					tempLS,
 					minTemp,
 					alphaTemp,
-					numberIteration):
+					numberIteration,
+					reset):
 		self.searchSpace = searchSpace
 		self.centerSpace = centerSpace
 		self.generations = generations
@@ -30,4 +31,5 @@ class params(object):
 		self.minTemp = minTemp
 		self.alphaTemp = alphaTemp
 		self.numberIteration = numberIteration
+		self.reset = reset
 		

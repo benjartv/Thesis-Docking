@@ -13,6 +13,11 @@ class agent(object):
 		self.distanceCriteria = distanceCriteria
 		self.ligand = ligand
 		self.centerSpace = newCenter
+
+	def resetAgent(self):
+		self.amountSolution = 0
+		self.current = None
+		self.pocket = [None]*self.maxPocket
 		
 	def getRandom(self):
 		realPocket = []
