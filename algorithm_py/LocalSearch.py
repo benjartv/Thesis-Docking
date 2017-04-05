@@ -17,6 +17,10 @@ class LocalSearch(object):
 		self.__numberScoring = 0
 		self.__temporalDir = "temp/"
 
+	def changeLigand(self, ligand):
+		self.__ligand = ligand
+		#self.__centerSpace = center
+
 	def initLocalSearch(self, cell):
 		#print "Init Local Search..."
 		T = self.__temp
@@ -34,7 +38,12 @@ class LocalSearch(object):
 
 	def getNeighbor(self, cell):
 		newCell = copy.deepcopy(cell)
-		newCell = self.mutation(newCell)
+		if self.__typeLS == 0:
+			newCell = self.mutation(newCell)
+		elif self.__typeLS == 1:
+			newCell = self.mutationBlock(newCell)
+		elif self.__typeLS == 2:
+			newCell = self.mutationRot(newCell)
 		newCell = self.calculates(newCell)
 		return copy.deepcopy(newCell)
 
@@ -78,6 +87,42 @@ class LocalSearch(object):
 		elif select == 6:
 			cell.theta = random.uniform(0,2)*math.pi
 		elif select == 7:
+			pos = random.randint(0, len(self.__ligand.branch)-1)
+			cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
+		return copy.deepcopy(cell)
+
+	def mutationBlock(self, cell):
+		select = random.randint(0,2)
+		if select == 0:
+			sel2 = random.randint(0,2)
+			if sel2 == 0:
+				cell.x = random.uniform(-self.__searchSpace, self.__searchSpace)
+			elif sel2 == 1:
+				cell.y = random.uniform(-self.__searchSpace, self.__searchSpace)
+			elif sel2 == 2:
+				cell.z = random.uniform(-self.__searchSpace, self.__searchSpace)
+		elif select == 1:
+			sel2 = random.randint(0,2)
+			if sel2 == 0:
+				cell.sph_theta = random.uniform(0,2)*math.pi
+			elif sel2 == 1:
+				cell.sph_phi = random.uniform(0,1)*math.pi
+			elif sel2 == 2:
+				cell.theta = random.uniform(0,2)*math.pi
+		elif select == 2:
+			pos = random.randint(0, len(self.__ligand.branch)-1)
+			cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
+		return cell
+
+	def mutationRot(self, cell):
+		select = random.randint(1,4)
+		if select == 1:
+			cell.sph_theta = random.uniform(0,2)*math.pi
+		elif select == 2:
+			cell.sph_phi = random.uniform(0,1)*math.pi
+		elif select == 3:
+			cell.theta = random.uniform(0,2)*math.pi
+		elif select == 4:
 			pos = random.randint(0, len(self.__ligand.branch)-1)
 			cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 		return copy.deepcopy(cell)

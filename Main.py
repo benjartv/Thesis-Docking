@@ -45,16 +45,27 @@ if __name__ == "__main__":
 	__pocketSize = 5 #size of the pocket of each agent
 	__treeNodes = 13 #number of nodes of the hierarchical tree
 	__mutProbability = 0.2 #probability of mutation
-	__isLocalSearch = False 
-	__typeCO = 0 #type of Crossover
-	__typeLS = 0 #type of Local Search
+	__isLocalSearch = True 
+	__typeCO = 1 #type of Crossover
+	# 0: crossover Uniform
+	# 1: crossover only center
+	__typeLS = 2 #type of Local Search
+	# 0: mutation Uniform
+	# 1: mutation block
+	# 2: mutation only Rotation (for crossover 1)
+	__typeMut = 0 #type of Mutation (Memetic)
+	# 0: mutation uniform
+	# 1: mutation block
 	__distanceCriteria = 2.0 #Acceptance criterion for each solution (gene)
 	__nodeByTree = 3 #number of agent for tree-level
-	__tempLS = 1000.0 #initial temperature for simulated annealing (LS)
+	__tempLS = 3.0 #initial temperature for simulated annealing (LS)
 	__minTemp = 1.0 #final temperature for simulated annealing (LS)
-	__alphaTemp = 0.9 #alpha for simulated annealing (LS)
+	__alphaTemp = 0.5 #alpha for simulated annealing (LS)
 	__numberIteration = 1 #by Local Search loop
-	__reset = 2 #number of generation between each reset (-1 for non reset)
+	__reset = -1 #number of generation between each reset (-1 for non reset)
+	__typeReset = 0 #Type of reset
+	# 0: generation reset
+	# 1: molecule reset
 
 
 	parameters = params(__searchSpace,
@@ -72,7 +83,9 @@ if __name__ == "__main__":
 						__minTemp,
 						__alphaTemp,
 						__numberIteration,
-						__reset)
+						__reset,
+						__typeReset,
+						__typeMut)
 	print "Init memetic algorithm..."
 	Memetic(parameters, modLigand, originalLigand).initProcess()
 	print "Removing temporal data..."

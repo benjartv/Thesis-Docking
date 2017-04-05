@@ -15,7 +15,9 @@ class params(object):
 					minTemp,
 					alphaTemp,
 					numberIteration,
-					reset):
+					reset,
+					typereset,
+					typemut):
 		self.searchSpace = searchSpace
 		self.centerSpace = centerSpace
 		self.generations = generations
@@ -32,4 +34,6 @@ class params(object):
 		self.alphaTemp = alphaTemp
 		self.numberIteration = numberIteration
 		self.reset = reset
+		self.typereset = typereset
+		self.typemut = typemut
 		
