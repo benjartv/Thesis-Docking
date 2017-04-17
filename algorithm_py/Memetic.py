@@ -74,9 +74,11 @@ class Memetic(object):
 		auxLigand = self.generateLigand(bestCell)
 		auxRMSD = getRMSD(auxLigand, self.__originalLigand)
 		print "RMSD: ", auxRMSD
+		rmsdArray = []
 		for i in range(self.__pocketSize):
 			if self.__rootNode.pocket[i] != None:
 				self.generateFinalBest(self.__rootNode.pocket[i], self.__dirResult+"/"+"best-lig-"+str(i)+".pdbqt")
+				rmsdArray.append(getRMSD(self.generateLigand(self.__rootNode.pocket[i]),self.__originalLigand))
 			if self.__typeReset == 1 and self.__reset != -1:
 				if self.__bestRoot.pocket[i] != None:
 					self.generateFinalBest(self.__bestRoot.pocket[i], self.__dirResult+"/"+"best-root-lig"+str(i)+".pdbqt")
@@ -91,7 +93,13 @@ class Memetic(object):
 
 		self.__logData += "Best ligand score: "+str(self.__bestScore)+"\n"
 		self.__logData += "Reached on generation: "+str(self.__bestGeneration)+"\n"
-		self.__logData += "RMSD: "+ str(auxRMSD)+"\n"
+		self.__logData += "RMSD Best: "+ str(auxRMSD)+"\n"
+		self.__logData += "RMSD Root: "
+		for i in range(len(rmsdArray)):
+			if i == len(rmsdArray)-1:
+				self.__logData += str(rmsdArray[i])+"\n"
+			else:
+				self.__logData += str(rmsdArray[i])+", "
 		self.__logData += "Time: "+ str(self.__Time)+"\n"
 		self.__logData += "Number of Energy Evaluation: "+ str(self.__numberScoring)+"\n"
 

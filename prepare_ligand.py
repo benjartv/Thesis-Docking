@@ -7,16 +7,19 @@ import sys
 import getopt
 import shutil
 import copy
+import math
 
 __namemolecule = "KNI"
-__searchSpace = 2
+__searchSpace = 10
 
 if __name__ == '__main__':
 	ormolecule = Molecule()
 	path = setPathLig(__namemolecule)
 	ormolecule.readPDBQT(path)
-	ormolecule.calculateSegment()
-
+	#ormolecule.calculateSegment()
+	#print ormolecule.data
+	ormolecule.calculeSegment2()
+	
 	solution = Gene()
 	solution.randomCell(int(ormolecule.torsdof), __searchSpace)
 	aux = copy.deepcopy(ormolecule)
@@ -30,3 +33,4 @@ if __name__ == '__main__':
 		aux.rotateAtomsBranch(i, solution.rotateBonds[i])
 
 	aux.writePDBQT(__namemolecule.lower()+"_mod.pdbqt")
+	

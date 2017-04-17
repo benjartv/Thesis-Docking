@@ -260,6 +260,7 @@ class Molecule(object):
 
     #Calculate the segment of each branch, save the data on rotationSegment list
     #each position fit with the position of the branch list
+    '''
     def calculateSegment(self):
         rootbranch = []
         for bond in self.branch:
@@ -287,6 +288,26 @@ class Molecule(object):
                         self.branchSegment.append(segment)
                         break
             i+=1
+    '''
+    def calculateSegment(self):
+        branchs = []
+        branchSeg = []
+        het = 0
+        for data in self.data:
+            if data[0] == "H":
+                het = int(data[1])
+            elif data[0] == "E":
+                segment = range(int(data[2]), het+1)
+                branchs.append([data[1],data[2]])
+                branchSeg.append(segment)
+
+        for b in self.branch:
+            ind = branchs.index(b)
+            self.branchSegment.append(branchSeg[ind])
+
+        #for b in range(len(branchSeg)):
+        #    print self.branch[b], self.branchSegment[b]
+
 
     def validateNormCero(self,vector):
         res = 0.0
