@@ -100,6 +100,10 @@ class Memetic(object):
 				self.__logData += str(rmsdArray[i])+"\n"
 			else:
 				self.__logData += str(rmsdArray[i])+", "
+		self.__logData += "All RMSD:\n"
+		allRMSD = self.findRMSD()
+		for i in allRMSD:
+			self.__logData += str(i[0])+": "+str(i[1])+"\n"
 		self.__logData += "Time: "+ str(self.__Time)+"\n"
 		self.__logData += "Number of Energy Evaluation: "+ str(self.__numberScoring)+"\n"
 
@@ -616,6 +620,29 @@ class Memetic(object):
 				pos = random.randint(0, len(self.__ligand.branch)-1)
 				cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 		return cell
+
+	def findRMSD(self):
+		arrayRMSD = []
+		i = 0
+		for cell in self.__rootNode.pocket:
+				if cell != None:
+					auxRMSD = getRMSD(self.generateLigand(cell), self.__originalLigand)
+					arrayRMSD.append([i,auxRMSD])
+		i += 1
+		for sol in self.__leafNode:
+			for cell in sol.pocket:
+				if cell != None:
+					auxRMSD = getRMSD(self.generateLigand(cell), self.__originalLigand)
+					arrayRMSD.append([i,auxRMSD])
+			i += 1
+		for sol in self.__fatherNode:
+			for cell in sol.pocket:
+				if cell != None:
+					auxRMSD = getRMSD(self.generateLigand(cell), self.__originalLigand)
+					arrayRMSD.append([i,auxRMSD])
+			i += 1
+		return arrayRMSD
+		
 
 	def mutationBlock(self, cell):
 		if random.uniform(0,1) <= self.__mutProbability:

@@ -41,7 +41,7 @@ if __name__ == "__main__":
 	spaceCenter = originalLigand.findCenter()
 	__searchSpace = 2 #search space for translate center of ligand
 	newSearchSpace = [random.uniform(-__searchSpace,__searchSpace)+spaceCenter[i] for i in range(3)]
-	__generations = 10 #number of generations until the algorithm stop
+	__generations = 50 #number of generations until the algorithm stop
 						#1120 for 1.000.000 energy evaluation
 	__pocketSize = 5 #size of the pocket of each agent
 	__treeNodes = 13 #number of nodes of the hierarchical tree

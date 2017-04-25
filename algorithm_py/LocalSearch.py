@@ -91,6 +91,9 @@ class LocalSearch(object):
 			cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 		return copy.deepcopy(cell)
 
+	def mutationSmartBranch(self, cell):
+		return 0
+
 	def mutationBlock(self, cell):
 		select = random.randint(0,2)
 		if select == 0:
