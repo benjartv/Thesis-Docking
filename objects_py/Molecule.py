@@ -260,35 +260,7 @@ class Molecule(object):
 
     #Calculate the segment of each branch, save the data on rotationSegment list
     #each position fit with the position of the branch list
-    '''
-    def calculateSegment(self):
-        rootbranch = []
-        for bond in self.branch:
-            if bond[0] in self.root:
-                rootbranch.append(int(bond[1]))
-        rootbranch.sort()
-        rootbranch.append(-1)
-        i = 0
-        while i < len(self.branch):
-            if int(self.branch[i][0]) in rootbranch:
-                pos = rootbranch.index(int(self.branch[i][0]))
-                if rootbranch[pos+1] != -1:
-                    segment = range(int(self.branch[i][1]), int(rootbranch[pos+1]))
-                else:
-                    segment = range(int(self.branch[i][1]), int(self.idatm[-1])+1)
-                self.branchSegment.append(segment)
-            else:
-                for r in rootbranch:
-                    if int(self.branch[i][1]) < r:
-                        segment = range(int(self.branch[i][1]),r)
-                        self.branchSegment.append(segment)
-                        break
-                    elif r == -1:
-                        segment = range(int(self.branch[i][1]), int(self.idatm[-1])+1)
-                        self.branchSegment.append(segment)
-                        break
-            i+=1
-    '''
+    
     def calculateSegment(self):
         branchs = []
         branchSeg = []
@@ -307,6 +279,27 @@ class Molecule(object):
 
         #for b in range(len(branchSeg)):
         #    print self.branch[b], self.branchSegment[b]
+
+
+    def getVector(self, atm):
+        vector = np.array([float(self.x[atm-1]),float(self.y[atm-1]),float(self.z[atm-1])])
+        return vector
+
+    def calcAngles(self, pos):
+        v1 = self.getVector(pos[0])
+        v2 = self.getVector(pos[1])
+        v3 = self.getVector(pos[2])
+        v4 = self.getVector(pos[3])
+
+        v12 = v1 - v2
+        v32 = v3 - v2 
+        v23 = v2 - v3
+        v43 = v4 - v3
+
+        vectA = np.cross(v12, v32)
+        vectB = np.cross(v23, v43)
+        final = np.dot(vectA, vectB) / math.sqrt(np.dot(vectA,vectA) * np.dot(vectB,vectB))
+        return math.degrees(math.acos(final))
 
 
     def validateNormCero(self,vector):
