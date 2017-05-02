@@ -17,7 +17,8 @@ class params(object):
 					numberIteration,
 					reset,
 					typereset,
-					typemut):
+					typemut,
+					iskb):
 		self.searchSpace = searchSpace
 		self.centerSpace = centerSpace
 		self.generations = generations
@@ -36,4 +37,5 @@ class params(object):
 		self.reset = reset
 		self.typereset = typereset
 		self.typemut = typemut
+		self.iskb = iskb
 		

@@ -128,6 +128,9 @@ def usage():
     print "\t U02 - 2UPJ"
     print "\t XV6 - 1BV9\n"
 
+def setAnglesPath(lig):
+    path = "molecules/anglesKB/"+str(lig)+"/"
+    return path
 
 def configParameters(name):
     params = open("ligands-config.txt", "r")

@@ -31,6 +31,8 @@ class Molecule(object):
         self.branchSegment = []
         self.torsdof = 0
         self.data = []
+        self.branchProb = []
+        self.anglesArray = []
 
     def rotateAtomsBranch(self, idbranch, theta):
         idatm1 = int(self.branch[idbranch][0])
@@ -63,6 +65,13 @@ class Molecule(object):
             self.x[j] = float(self.x[j]) + delthaX
             self.y[j] = float(self.y[j]) + delthaY
             self.z[j] = float(self.z[j]) + delthaZ
+
+    def rotateBranchKB(self, idbranch, theta):
+        bondarray = self.anglesArray[idbranch]
+        torsion = self.calcAngles(bondarray)
+        radtor = np.radians(torsion)
+        return abs(theta-radtor)
+
 
     def translateToPoint(self, point):
         center = self.findCenter()
@@ -281,26 +290,41 @@ class Molecule(object):
         #    print self.branch[b], self.branchSegment[b]
 
 
-    def getVector(self, atm):
+    def importAngles(self, files, anglesPath):
+        for file in files:
+            angles = []
+            arch = open(anglesPath+file)
+            data = arch.readlines()
+            arch.close()
+            for dat in data:
+                angles.append(int(dat.strip()))
+            self.branchProb.append(angles)
+            dfile = []
+            for at in file.strip(".txt").split("-"):
+                dfile.append(int(at))
+            self.anglesArray.append(dfile)
+
+    def getVectorAtm(self, atm):
         vector = np.array([float(self.x[atm-1]),float(self.y[atm-1]),float(self.z[atm-1])])
         return vector
 
     def calcAngles(self, pos):
-        v1 = self.getVector(pos[0])
-        v2 = self.getVector(pos[1])
-        v3 = self.getVector(pos[2])
-        v4 = self.getVector(pos[3])
+        v1 = self.getVectorAtm(pos[0])
+        v2 = self.getVectorAtm(pos[1])
+        v3 = self.getVectorAtm(pos[2])
+        v4 = self.getVectorAtm(pos[3])
 
-        v12 = v1 - v2
-        v32 = v3 - v2 
-        v23 = v2 - v3
+        v21 = v2 - v1
+        v32 = v3 - v2
         v43 = v4 - v3
 
-        vectA = np.cross(v12, v32)
-        vectB = np.cross(v23, v43)
-        final = np.dot(vectA, vectB) / math.sqrt(np.dot(vectA,vectA) * np.dot(vectB,vectB))
-        return math.degrees(math.acos(final))
-
+        vectA = np.cross(v21, v32)
+        vectB = np.cross(v32, v43)
+        torq = np.dot(vectA, vectB) / math.sqrt(np.dot(vectA,vectA) * np.dot(vectB,vectB))
+        angle = math.degrees(math.acos(torq))
+        if np.dot(vectA, np.cross(vectB,v32)) < 0:
+            angle *= -1
+        return angle
 
     def validateNormCero(self,vector):
         res = 0.0

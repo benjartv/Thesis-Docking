@@ -5,7 +5,7 @@ from utils_py.utils import *
 
 class LocalSearch(object):
 	"""docstring for localsearch"""
-	def __init__(self, temp, tempMin, tempAlpha, ligand, searchSpace, centerSpace, typeLS, numIteration):
+	def __init__(self, temp, tempMin, tempAlpha, ligand, searchSpace, centerSpace, typeLS, numIteration, iskb):
 		self.__temp = temp
 		self.__tempMin = tempMin
 		self.__tempAlpha = tempAlpha
@@ -16,6 +16,7 @@ class LocalSearch(object):
 		self.__numIteration = numIteration
 		self.__numberScoring = 0
 		self.__temporalDir = "temp/"
+		self.__isKb = iskb
 
 	def changeLigand(self, ligand):
 		self.__ligand = ligand
@@ -65,8 +66,13 @@ class LocalSearch(object):
 									self.__centerSpace[2]+cell.z])
 		sphVect = spherePoint(1, cell.sph_theta, cell.sph_phi)
 		auxLigand.rotateByVector(sphVect, cell.theta)
-		for i in range(len(auxLigand.branch)):
-			auxLigand.rotateAtomsBranch(i, cell.rotateBonds[i])
+		if self.__isKb:
+			for i in range(len(auxLigand.branch)):
+				torAngle = auxLigand.rotateBranchKB(i, cell.rotateBonds[i])
+				auxLigand.rotateAtomsBranch(i, torAngle)
+		else:
+			for i in range(len(auxLigand.branch)):
+				auxLigand.rotateAtomsBranch(i, cell.rotateBonds[i])
 		auxLigand.writePDBQT(self.__temporalDir+"ligand.pdbqt")
 		cell.score = calculateFreeEnergy()
 		self.__numberScoring += 1
@@ -88,11 +94,11 @@ class LocalSearch(object):
 			cell.theta = random.uniform(0,2)*math.pi
 		elif select == 7:
 			pos = random.randint(0, len(self.__ligand.branch)-1)
-			cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
+			if self.__isKB:
+				cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
+			else:
+				cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 		return copy.deepcopy(cell)
-
-	def mutationSmartBranch(self, cell):
-		return 0
 
 	def mutationBlock(self, cell):
 		select = random.randint(0,2)
@@ -114,7 +120,10 @@ class LocalSearch(object):
 				cell.theta = random.uniform(0,2)*math.pi
 		elif select == 2:
 			pos = random.randint(0, len(self.__ligand.branch)-1)
-			cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
+			if self.__isKB:
+				cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
+			else:
+				cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 		return cell
 
 	def mutationRot(self, cell):
@@ -127,7 +136,10 @@ class LocalSearch(object):
 			cell.theta = random.uniform(0,2)*math.pi
 		elif select == 4:
 			pos = random.randint(0, len(self.__ligand.branch)-1)
-			cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
+			if self.__isKB:
+				cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
+			else:
+				cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 		return copy.deepcopy(cell)
 
 	def getNumberEvaluation(self):

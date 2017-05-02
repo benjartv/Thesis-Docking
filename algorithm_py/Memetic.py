@@ -38,11 +38,11 @@ class Memetic(object):
 		self.__rCount = 0
 		self.__reset = params.reset
 		self.__typeReset = params.typereset
+		self.__isKB = params.iskb
 		if self.__typeReset == 1:
 			self.__bestRoot = None
 		if self.__reset != -1:
 			self.__isReset = True
-
 		if self.__isLocalSearch:
 			self.__LocalSearch = LocalSearch(params.tempLS,
 											params.minTemp,
@@ -51,7 +51,8 @@ class Memetic(object):
 											self.__searchSpace,
 											self.__centerSpace,
 											params.typeLS,
-											params.numberIteration)
+											params.numberIteration,
+											params.iskb)
 	
 	def initProcess(self):
 		startTime = datetime.datetime.now()
@@ -127,22 +128,40 @@ class Memetic(object):
 							self.__centerSpace)
 
 	def initPopulation(self, first = True):
-		gene = Gene()
-		gene.randomCell(len(self.__ligand.branchSegment), self.__searchSpace)
-		gene = self.calculates(gene)
-		self.__rootNode.addToPocket(copy.deepcopy(gene))
-		for n in range(len(self.__fatherNode)):
+		if self.__isKB:
+			gene = Gene()
+			gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray)
+			gene = self.calculates(gene)
+			self.__rootNode.addToPocket(copy.deepcopy(gene))
+			for n in range(len(self.__fatherNode)):
+				gene = Gene()
+				gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray)
+				gene = self.calculates(gene)
+				self.__fatherNode[n].addToPocket(copy.deepcopy(gene))
+			for n in range(len(self.__leafNode)):
+				gene = Gene()
+				gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray)
+				gene = self.calculates(gene)
+				self.__leafNode[n].addToPocket(copy.deepcopy(gene))
+			if first:
+				self.initLog()
+		else:
 			gene = Gene()
 			gene.randomCell(len(self.__ligand.branchSegment), self.__searchSpace)
 			gene = self.calculates(gene)
-			self.__fatherNode[n].addToPocket(copy.deepcopy(gene))
-		for n in range(len(self.__leafNode)):
-			gene = Gene()
-			gene.randomCell(len(self.__ligand.branchSegment), self.__searchSpace)
-			gene = self.calculates(gene)
-			self.__leafNode[n].addToPocket(copy.deepcopy(gene))
-		if first:
-			self.initLog()
+			self.__rootNode.addToPocket(copy.deepcopy(gene))
+			for n in range(len(self.__fatherNode)):
+				gene = Gene()
+				gene.randomCell(len(self.__ligand.branchSegment), self.__searchSpace)
+				gene = self.calculates(gene)
+				self.__fatherNode[n].addToPocket(copy.deepcopy(gene))
+			for n in range(len(self.__leafNode)):
+				gene = Gene()
+				gene.randomCell(len(self.__ligand.branchSegment), self.__searchSpace)
+				gene = self.calculates(gene)
+				self.__leafNode[n].addToPocket(copy.deepcopy(gene))
+			if first:
+				self.initLog()
 
 	def updateBest(self, score, generation):
 		if self.__typeReset == 1 and self.__reset != -1:
@@ -165,8 +184,13 @@ class Memetic(object):
 									self.__centerSpace[2]+newcell.z])
 		sphVect = spherePoint(1, newcell.sph_theta, newcell.sph_phi)
 		auxLigand.rotateByVector(sphVect, newcell.theta)
-		for i in range(len(auxLigand.branch)):
-			auxLigand.rotateAtomsBranch(i, newcell.rotateBonds[i])
+		if self.__isKB:
+			for i in range(len(auxLigand.branch)):
+				torAngle = auxLigand.rotateBranchKB(i, newcell.rotateBonds[i])
+				auxLigand.rotateAtomsBranch(i, torAngle)
+		else:
+			for i in range(len(auxLigand.branch)):
+				auxLigand.rotateAtomsBranch(i, newcell.rotateBonds[i])
 		auxLigand.writePDBQT(self.__temporalDir+"ligand.pdbqt")
 		newcell.score = calculateFreeEnergy()
 		self.__numberScoring += 1
@@ -179,8 +203,13 @@ class Memetic(object):
 									self.__centerSpace[2]+cell.z])
 		sphVect = spherePoint(1, cell.sph_theta, cell.sph_phi)
 		auxLigand.rotateByVector(sphVect, cell.theta)
-		for i in range(len(auxLigand.branch)):
-			auxLigand.rotateAtomsBranch(i, cell.rotateBonds[i])
+		if self.__isKB:
+			for i in range(len(auxLigand.branch)):
+				torAngle = auxLigand.rotateBranchKB(i, cell.rotateBonds[i])
+				auxLigand.rotateAtomsBranch(i, torAngle)
+		else:
+			for i in range(len(auxLigand.branch)):
+				auxLigand.rotateAtomsBranch(i, cell.rotateBonds[i])
 		return copy.deepcopy(auxLigand)
 
 	def generateFinalBest(self, cell, name="best-ligand.pdbqt"):
@@ -190,8 +219,13 @@ class Memetic(object):
 									self.__centerSpace[2]+cell.z])
 		sphVect = spherePoint(1, cell.sph_theta, cell.sph_phi)
 		auxLigand.rotateByVector(sphVect, cell.theta)
-		for i in range(len(auxLigand.branch)):
-			auxLigand.rotateAtomsBranch(i, cell.rotateBonds[i])
+		if self.__isKB:
+			for i in range(len(auxLigand.branch)):
+				torAngle = auxLigand.rotateBranchKB(i, cell.rotateBonds[i])
+				auxLigand.rotateAtomsBranch(i, torAngle)	
+		else:
+			for i in range(len(auxLigand.branch)):
+				auxLigand.rotateAtomsBranch(i, cell.rotateBonds[i])
 		auxLigand.writePDBQT(name)
 
 	def generation(self):
@@ -567,21 +601,39 @@ class Memetic(object):
 		self.__rootNode.resetAgent()
 		self.__rootNode.addToPocket(bestCell)
 
-		gene = Gene()
-		gene.randomCell(len(self.__ligand.branchSegment), self.__searchSpace)
-		gene = self.calculates(gene)
-		self.__rootNode.addToPocket(copy.deepcopy(gene))
+		if self.__isKB:
+			gene = Gene()
+			gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray)
+			gene = self.calculates(gene)
+			self.__rootNode.addToPocket(copy.deepcopy(gene))
 
-		for n in range(len(self.__fatherNode)):
+			for n in range(len(self.__fatherNode)):
+				gene = Gene()
+				gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray)
+				gene = self.calculates(gene)
+				self.__fatherNode[n].addToPocket(copy.deepcopy(gene))
+			for n in range(len(self.__leafNode)):
+				gene = Gene()
+				gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray)
+				gene = self.calculates(gene)
+				self.__leafNode[n].addToPocket(copy.deepcopy(gene))
+		else:
 			gene = Gene()
 			gene.randomCell(len(self.__ligand.branchSegment), self.__searchSpace)
 			gene = self.calculates(gene)
-			self.__fatherNode[n].addToPocket(copy.deepcopy(gene))
-		for n in range(len(self.__leafNode)):
-			gene = Gene()
-			gene.randomCell(len(self.__ligand.branchSegment), self.__searchSpace)
-			gene = self.calculates(gene)
-			self.__leafNode[n].addToPocket(copy.deepcopy(gene))
+			self.__rootNode.addToPocket(copy.deepcopy(gene))
+
+			for n in range(len(self.__fatherNode)):
+				gene = Gene()
+				gene.randomCell(len(self.__ligand.branchSegment), self.__searchSpace)
+				gene = self.calculates(gene)
+				self.__fatherNode[n].addToPocket(copy.deepcopy(gene))
+			for n in range(len(self.__leafNode)):
+				gene = Gene()
+				gene.randomCell(len(self.__ligand.branchSegment), self.__searchSpace)
+				gene = self.calculates(gene)
+				self.__leafNode[n].addToPocket(copy.deepcopy(gene))
+
 
 	def resetMolecule(self):
 		self.__bestRoot = copy.deepcopy(self.__rootNode)
@@ -618,7 +670,10 @@ class Memetic(object):
 				cell.theta = random.uniform(0,2)*math.pi
 			elif select == 7:
 				pos = random.randint(0, len(self.__ligand.branch)-1)
-				cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
+				if self.__isKB:
+					cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
+				else:
+					cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 		return cell
 
 	def findRMSD(self):
@@ -665,7 +720,10 @@ class Memetic(object):
 					cell.theta = random.uniform(0,2)*math.pi
 			elif select == 2:
 				pos = random.randint(0, len(self.__ligand.branch)-1)
-				cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
+				if self.__isKB:
+					cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
+				else:
+					cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 		return cell
 
 

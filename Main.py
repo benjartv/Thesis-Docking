@@ -13,6 +13,23 @@ __protein = __molecules[1]
 
 
 if __name__ == "__main__":
+	anglesPath = setAnglesPath(__ligand)
+
+	files = list()
+	files.append("23-1-4-5.txt")
+	files.append("1-4-5-6.txt")
+	files.append("4-5-6-7.txt")
+	files.append("8-10-13-18.txt")
+	files.append("4-1-23-24.txt")
+	files.append("1-23-24-27.txt")
+	files.append("23-24-27-28.txt")
+	files.append("24-27-28-29.txt")
+	files.append("27-28-29-33.txt")
+	files.append("32-31-36-37.txt")
+	files.append("37-38-42-43.txt")
+
+	__isKB = True
+
 	print "Preparing molecules..."
 	originalLigand = Molecule(__ligand)
 
@@ -33,20 +50,23 @@ if __name__ == "__main__":
 	modLigand.readPDBQT(modligPath)
 	modLigand.calculateSegment()
 	print "Complete."
-
+	if __isKB:
+		print "Import Knowledge Base..."
+		modLigand.importAngles(files, anglesPath)
+		print "Complete."
 	print "Set vina configuration...",
 	configParameters(__ligand)
 	print "Complete."	
 
 	spaceCenter = originalLigand.findCenter()
-	__searchSpace = 2 #search space for translate center of ligand
+	__searchSpace = 3 #search space for translate center of ligand
 	newSearchSpace = [random.uniform(-__searchSpace,__searchSpace)+spaceCenter[i] for i in range(3)]
-	__generations = 50 #number of generations until the algorithm stop
+	__generations = 2 #number of generations until the algorithm stop
 						#1120 for 1.000.000 energy evaluation
 	__pocketSize = 5 #size of the pocket of each agent
 	__treeNodes = 13 #number of nodes of the hierarchical tree
 	__mutProbability = 0.2 #probability of mutation
-	__isLocalSearch = True 
+	__isLocalSearch = False 
 	__typeCO = 0 #type of Crossover
 	# 0: crossover Uniform
 	# 1: crossover only center
@@ -57,13 +77,13 @@ if __name__ == "__main__":
 	__typeMut = 1 #type of Mutation (Memetic)
 	# 0: mutation uniform
 	# 1: mutation block
-	__distanceCriteria = 0.5 #Acceptance criterion for each solution (gene)
+	__distanceCriteria = 1.5 #Acceptance criterion for each solution (gene)
 	__nodeByTree = 3 #number of agent for tree-level
-	__tempLS = 1000.0 #initial temperature for simulated annealing (LS)
+	__tempLS = 10.0 #initial temperature for simulated annealing (LS)
 	__minTemp = 1.0 #final temperature for simulated annealing (LS)
 	__alphaTemp = 0.9 #alpha for simulated annealing (LS)
 	__numberIteration = 1 #by Local Search loop
-	__reset = -1 #number of generation between each reset (-1 for non reset)
+	__reset = 1 #number of generation between each reset (-1 for non reset)
 	__typeReset = 0 #Type of reset
 	# 0: generation reset
 	# 1: molecule reset
@@ -86,7 +106,8 @@ if __name__ == "__main__":
 						__numberIteration,
 						__reset,
 						__typeReset,
-						__typeMut)
+						__typeMut,
+						__isKB)
 	print "Init memetic algorithm..."
 	Memetic(parameters, modLigand, originalLigand).initProcess()
 	print "Removing temporal data..."

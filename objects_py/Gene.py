@@ -1,5 +1,6 @@
 import random
 import math
+import numpy as np
 
 # --------------------------- Gene Object ---------------------------
 class Gene:
@@ -25,3 +26,15 @@ class Gene:
     	for i in range(rotateBond):
     		angle = random.uniform(0,2)*math.pi
     		self.rotateBonds.append(angle)
+
+    def randomCellKB(self, rotateBond, searchSpace, kbase):
+        self.x = random.uniform(-searchSpace, searchSpace)
+        self.y = random.uniform(-searchSpace, searchSpace)
+        self.z = random.uniform(-searchSpace, searchSpace)
+        self.sph_theta = random.uniform(0,2)*math.pi
+        self.sph_phi = random.uniform(0,1)*math.pi
+        self.theta = random.uniform(0,2)*math.pi
+        for i in range(rotateBond):
+            angle = np.radians(random.choice(kbase[i]))
+            self.rotateBonds.append(angle)
+
