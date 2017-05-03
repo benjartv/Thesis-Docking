@@ -94,7 +94,7 @@ class LocalSearch(object):
 			cell.theta = random.uniform(0,2)*math.pi
 		elif select == 7:
 			pos = random.randint(0, len(self.__ligand.branch)-1)
-			if self.__isKB:
+			if self.__isKb:
 				cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
 			else:
 				cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
@@ -120,7 +120,7 @@ class LocalSearch(object):
 				cell.theta = random.uniform(0,2)*math.pi
 		elif select == 2:
 			pos = random.randint(0, len(self.__ligand.branch)-1)
-			if self.__isKB:
+			if self.__isKb:
 				cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
 			else:
 				cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
@@ -136,7 +136,7 @@ class LocalSearch(object):
 			cell.theta = random.uniform(0,2)*math.pi
 		elif select == 4:
 			pos = random.randint(0, len(self.__ligand.branch)-1)
-			if self.__isKB:
+			if self.__isKb:
 				cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
 			else:
 				cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
