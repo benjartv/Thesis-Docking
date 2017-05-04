@@ -39,6 +39,7 @@ class Memetic(object):
 		self.__reset = params.reset
 		self.__typeReset = params.typereset
 		self.__isKB = params.iskb
+		self.__kbProb = params.kbProb
 		if self.__typeReset == 1:
 			self.__bestRoot = None
 		if self.__reset != -1:
@@ -52,7 +53,8 @@ class Memetic(object):
 											self.__centerSpace,
 											params.typeLS,
 											params.numberIteration,
-											params.iskb)
+											params.iskb,
+											params.kbProb)
 	
 	def initProcess(self):
 		startTime = datetime.datetime.now()
@@ -130,17 +132,17 @@ class Memetic(object):
 	def initPopulation(self, first = True):
 		if self.__isKB:
 			gene = Gene()
-			gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray)
+			gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray, self.__kbProb)
 			gene = self.calculates(gene)
 			self.__rootNode.addToPocket(copy.deepcopy(gene))
 			for n in range(len(self.__fatherNode)):
 				gene = Gene()
-				gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray)
+				gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray, self.__kbProb)
 				gene = self.calculates(gene)
 				self.__fatherNode[n].addToPocket(copy.deepcopy(gene))
 			for n in range(len(self.__leafNode)):
 				gene = Gene()
-				gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray)
+				gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray, self.__kbProb)
 				gene = self.calculates(gene)
 				self.__leafNode[n].addToPocket(copy.deepcopy(gene))
 			if first:
@@ -603,18 +605,18 @@ class Memetic(object):
 
 		if self.__isKB:
 			gene = Gene()
-			gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray)
+			gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray, self.__kbProb)
 			gene = self.calculates(gene)
 			self.__rootNode.addToPocket(copy.deepcopy(gene))
 
 			for n in range(len(self.__fatherNode)):
 				gene = Gene()
-				gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray)
+				gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray, self.__kbProb)
 				gene = self.calculates(gene)
 				self.__fatherNode[n].addToPocket(copy.deepcopy(gene))
 			for n in range(len(self.__leafNode)):
 				gene = Gene()
-				gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray)
+				gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray, self.__kbProb)
 				gene = self.calculates(gene)
 				self.__leafNode[n].addToPocket(copy.deepcopy(gene))
 		else:
@@ -671,7 +673,10 @@ class Memetic(object):
 			elif select == 7:
 				pos = random.randint(0, len(self.__ligand.branch)-1)
 				if self.__isKB:
-					cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
+					if random.uniform(0,1) <= self.__kbProb:
+						cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
+					else:
+						cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 				else:
 					cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 		return cell
@@ -721,7 +726,10 @@ class Memetic(object):
 			elif select == 2:
 				pos = random.randint(0, len(self.__ligand.branch)-1)
 				if self.__isKB:
-					cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
+					if random.uniform(0,1) <= self.__kbProb:
+						cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
+					else:
+						cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 				else:
 					cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 		return cell

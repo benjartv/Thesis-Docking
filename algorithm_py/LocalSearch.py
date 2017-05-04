@@ -5,7 +5,7 @@ from utils_py.utils import *
 
 class LocalSearch(object):
 	"""docstring for localsearch"""
-	def __init__(self, temp, tempMin, tempAlpha, ligand, searchSpace, centerSpace, typeLS, numIteration, iskb):
+	def __init__(self, temp, tempMin, tempAlpha, ligand, searchSpace, centerSpace, typeLS, numIteration, iskb, kbprob):
 		self.__temp = temp
 		self.__tempMin = tempMin
 		self.__tempAlpha = tempAlpha
@@ -17,6 +17,7 @@ class LocalSearch(object):
 		self.__numberScoring = 0
 		self.__temporalDir = "temp/"
 		self.__isKb = iskb
+		self.__kbProb = kbprob
 
 	def changeLigand(self, ligand):
 		self.__ligand = ligand
@@ -95,7 +96,10 @@ class LocalSearch(object):
 		elif select == 7:
 			pos = random.randint(0, len(self.__ligand.branch)-1)
 			if self.__isKb:
-				cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
+				if random.uniform(0,1) <= self.__kbProb:
+					cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
+				else:
+					cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 			else:
 				cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 		return copy.deepcopy(cell)
@@ -121,7 +125,10 @@ class LocalSearch(object):
 		elif select == 2:
 			pos = random.randint(0, len(self.__ligand.branch)-1)
 			if self.__isKb:
-				cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
+				if random.uniform(0,1) <= self.__kbProb:
+					cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
+				else:
+					cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 			else:
 				cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 		return cell
@@ -137,7 +144,10 @@ class LocalSearch(object):
 		elif select == 4:
 			pos = random.randint(0, len(self.__ligand.branch)-1)
 			if self.__isKb:
-				cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
+				if random.uniform(0,1) <= self.__kbProb:
+					cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
+				else:
+					cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 			else:
 				cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 		return copy.deepcopy(cell)

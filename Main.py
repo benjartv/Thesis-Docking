@@ -29,6 +29,7 @@ if __name__ == "__main__":
 	files.append("37-38-42-43.txt")
 
 	__isKB = True
+	__KBProb = 0.8 #Probability of using knowledge base
 
 	print "Preparing molecules..."
 	originalLigand = Molecule(__ligand)
@@ -61,12 +62,12 @@ if __name__ == "__main__":
 	spaceCenter = originalLigand.findCenter()
 	__searchSpace = 3 #search space for translate center of ligand
 	newSearchSpace = [random.uniform(-__searchSpace,__searchSpace)+spaceCenter[i] for i in range(3)]
-	__generations = 2 #number of generations until the algorithm stop
+	__generations = 1230 #number of generations until the algorithm stop
 						#1120 for 1.000.000 energy evaluation
 	__pocketSize = 5 #size of the pocket of each agent
 	__treeNodes = 13 #number of nodes of the hierarchical tree
 	__mutProbability = 0.2 #probability of mutation
-	__isLocalSearch = False 
+	__isLocalSearch = True
 	__typeCO = 0 #type of Crossover
 	# 0: crossover Uniform
 	# 1: crossover only center
@@ -79,11 +80,11 @@ if __name__ == "__main__":
 	# 1: mutation block
 	__distanceCriteria = 1.5 #Acceptance criterion for each solution (gene)
 	__nodeByTree = 3 #number of agent for tree-level
-	__tempLS = 10.0 #initial temperature for simulated annealing (LS)
+	__tempLS = 1000.0 #initial temperature for simulated annealing (LS)
 	__minTemp = 1.0 #final temperature for simulated annealing (LS)
 	__alphaTemp = 0.9 #alpha for simulated annealing (LS)
 	__numberIteration = 1 #by Local Search loop
-	__reset = 1 #number of generation between each reset (-1 for non reset)
+	__reset = 130 #number of generation between each reset (-1 for non reset)
 	__typeReset = 0 #Type of reset
 	# 0: generation reset
 	# 1: molecule reset
@@ -107,7 +108,8 @@ if __name__ == "__main__":
 						__reset,
 						__typeReset,
 						__typeMut,
-						__isKB)
+						__isKB,
+						__KBProb)
 	print "Init memetic algorithm..."
 	Memetic(parameters, modLigand, originalLigand).initProcess()
 	print "Removing temporal data..."

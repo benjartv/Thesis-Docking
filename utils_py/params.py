@@ -18,7 +18,8 @@ class params(object):
 					reset,
 					typereset,
 					typemut,
-					iskb):
+					iskb,
+					kbprob):
 		self.searchSpace = searchSpace
 		self.centerSpace = centerSpace
 		self.generations = generations
@@ -38,4 +39,5 @@ class params(object):
 		self.typereset = typereset
 		self.typemut = typemut
 		self.iskb = iskb
+		self.kbProb = kbprob
 		

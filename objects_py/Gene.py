@@ -27,7 +27,7 @@ class Gene:
     		angle = random.uniform(0,2)*math.pi
     		self.rotateBonds.append(angle)
 
-    def randomCellKB(self, rotateBond, searchSpace, kbase):
+    def randomCellKB(self, rotateBond, searchSpace, kbase, prob):
         self.x = random.uniform(-searchSpace, searchSpace)
         self.y = random.uniform(-searchSpace, searchSpace)
         self.z = random.uniform(-searchSpace, searchSpace)
@@ -35,6 +35,9 @@ class Gene:
         self.sph_phi = random.uniform(0,1)*math.pi
         self.theta = random.uniform(0,2)*math.pi
         for i in range(rotateBond):
-            angle = np.radians(random.choice(kbase[i]))
+            if random.uniform(0,1) <= prob:
+                angle = np.radians(random.choice(kbase[i]))
+            else:
+                angle = random.uniform(0,2)*math.pi
             self.rotateBonds.append(angle)
 
