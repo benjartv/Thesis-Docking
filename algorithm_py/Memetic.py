@@ -674,7 +674,8 @@ class Memetic(object):
 				pos = random.randint(0, len(self.__ligand.branch)-1)
 				if self.__isKB:
 					if random.uniform(0,1) <= self.__kbProb:
-						cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
+						ang = random.choice(self.__ligand.anglesArray[pos])
+						cell.rotateBonds[pos] = np.radians(random.uniform(ang-1,ang+1))
 					else:
 						cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 				else:
@@ -727,7 +728,8 @@ class Memetic(object):
 				pos = random.randint(0, len(self.__ligand.branch)-1)
 				if self.__isKB:
 					if random.uniform(0,1) <= self.__kbProb:
-						cell.rotateBonds[pos] = np.radians(random.choice(self.__ligand.anglesArray[pos]))
+						ang = random.choice(self.__ligand.anglesArray[pos])
+						cell.rotateBonds[pos] = np.radians(random.uniform(ang-1,ang+1))
 					else:
 						cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 				else:
