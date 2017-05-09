@@ -36,7 +36,7 @@ class Gene:
         self.theta = random.uniform(0,2)*math.pi
         for i in range(rotateBond):
             if random.uniform(0,1) <= prob:
-                ang = random.choice(random.choice(kbase[i]))
+                ang = random.choice(kbase[i])
                 angle = np.radians(random.uniform(ang-1,ang+1))
             else:
                 angle = random.uniform(0,2)*math.pi
