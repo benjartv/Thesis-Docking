@@ -9,19 +9,17 @@ import shutil
 import copy
 import math
 
-__namemolecule = "KNI"
+__namemolecule = "NAD"
 __searchSpace = 10
 
 if __name__ == '__main__':
 	ormolecule = Molecule()
 	path = setPathLig(__namemolecule)
 	ormolecule.readPDBQT(path)
-	#ormolecule.calculateSegment()
-	#print ormolecule.data
-	ormolecule.calculeSegment2()
+	ormolecule.calculateSegment()
 	
 	solution = Gene()
-	solution.randomCell(int(ormolecule.torsdof), __searchSpace)
+	solution.rigidRandomCell(__searchSpace)
 	aux = copy.deepcopy(ormolecule)
 	center = aux.findCenter()
 	aux.translateToPoint([center[0]+solution.x,
@@ -29,8 +27,6 @@ if __name__ == '__main__':
 						center[2]+solution.z,])
 	sphVect = spherePoint(1, solution.sph_theta, solution.sph_phi)
 	aux.rotateByVector(sphVect, solution.theta)
-	for i in range(len(aux.branch)):
-		aux.rotateAtomsBranch(i, solution.rotateBonds[i])
 
 	aux.writePDBQT(__namemolecule.lower()+"_mod.pdbqt")
 	

@@ -13,22 +13,8 @@ __protein = __molecules[1]
 
 
 if __name__ == "__main__":
-	anglesPath = setAnglesPath(__ligand)
-
-	files = list()
-	files.append("23-1-4-5.txt")
-	files.append("1-4-5-6.txt")
-	files.append("4-5-6-7.txt")
-	files.append("8-10-13-18.txt")
-	files.append("4-1-23-24.txt")
-	files.append("1-23-24-27.txt")
-	files.append("23-24-27-28.txt")
-	files.append("24-27-28-29.txt")
-	files.append("27-28-29-33.txt")
-	files.append("32-31-36-37.txt")
-	files.append("37-38-42-43.txt")
-
-	__isKB = True
+	
+	__isKB = False
 	__KBProb = 0.8 #Probability of using knowledge base
 
 	print "Preparing molecules..."
@@ -52,7 +38,10 @@ if __name__ == "__main__":
 	modLigand.calculateSegment()
 	print "Complete."
 	if __isKB:
-		print "Import Knowledge Base..."
+		print "Import Knowledge Base...",
+		kbname = "kb-"+__ligand.lower()
+		files = readKBfileName(kbname)
+		anglesPath = setAnglesPath(__ligand)
 		modLigand.importAngles(files, anglesPath)
 		print "Complete."
 	print "Set vina configuration...",
@@ -62,29 +51,35 @@ if __name__ == "__main__":
 	spaceCenter = originalLigand.findCenter()
 	__searchSpace = 3 #search space for translate center of ligand
 	newSearchSpace = [random.uniform(-__searchSpace,__searchSpace)+spaceCenter[i] for i in range(3)]
-	__generations = 1230 #number of generations until the algorithm stop
+	__generations = 1 #number of generations until the algorithm stop
 						#1120 for 1.000.000 energy evaluation
 	__pocketSize = 5 #size of the pocket of each agent
 	__treeNodes = 13 #number of nodes of the hierarchical tree
 	__mutProbability = 0.2 #probability of mutation
 	__isLocalSearch = True
-	__typeCO = 0 #type of Crossover
+
+	__typeCO = 1 #type of Crossover
 	# 0: crossover Uniform
-	# 1: crossover only center
-	__typeLS = 1 #type of Local Search
-	# 0: mutation Uniform
-	# 1: mutation block
-	# 2: mutation only Rotation (for crossover 1)
+	# 1: crossover Block
+	# 2: crossover SPC
+	# 3: crossover 50/50
+	# 4: crossover only Center (ONLY for LS 2)
+
+	__typeLS = 2 #type of Local Search
+	# 0: mutation block
+	# 1: mutation spacereduce by iteration
+	# 2: mutation only Rotation (ONLY for CS 1)
+
 	__typeMut = 1 #type of Mutation (Memetic)
-	# 0: mutation uniform
+	# 0: mutation uniform (not recomended)
 	# 1: mutation block
-	__distanceCriteria = 1.5 #Acceptance criterion for each solution (gene)
+	__distanceCriLVL = [1.5,1.0,0.5] #Aceptance criterion for each lvl of the tree
 	__nodeByTree = 3 #number of agent for tree-level
 	__tempLS = 1000.0 #initial temperature for simulated annealing (LS)
 	__minTemp = 1.0 #final temperature for simulated annealing (LS)
 	__alphaTemp = 0.9 #alpha for simulated annealing (LS)
 	__numberIteration = 1 #by Local Search loop
-	__reset = 130 #number of generation between each reset (-1 for non reset)
+	__reset = 50 #number of generation between each reset (-1 for non reset)
 	__typeReset = 0 #Type of reset
 	# 0: generation reset
 	# 1: molecule reset
@@ -99,7 +94,6 @@ if __name__ == "__main__":
 						__isLocalSearch,
 						__typeLS,
 						__typeCO,
-						__distanceCriteria,
 						__nodeByTree,
 						__tempLS,
 						__minTemp,
@@ -109,7 +103,8 @@ if __name__ == "__main__":
 						__typeReset,
 						__typeMut,
 						__isKB,
-						__KBProb)
+						__KBProb,
+						__distanceCriLVL)
 	print "Init memetic algorithm..."
 	Memetic(parameters, modLigand, originalLigand).initProcess()
 	print "Removing temporal data..."

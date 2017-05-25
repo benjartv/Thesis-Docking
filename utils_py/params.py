@@ -9,7 +9,6 @@ class params(object):
 					isLocalSearch,
 					typeLS,
 					typeCO,
-					distanceCriteria,
 					nodeByTree,
 					tempLS,
 					minTemp,
@@ -19,7 +18,8 @@ class params(object):
 					typereset,
 					typemut,
 					iskb,
-					kbprob):
+					kbprob,
+					distanceCritLVL):
 		self.searchSpace = searchSpace
 		self.centerSpace = centerSpace
 		self.generations = generations
@@ -29,7 +29,6 @@ class params(object):
 		self.isLocalSearch = isLocalSearch
 		self.typeLS = typeLS
 		self.typeCO = typeCO
-		self.distanceCriteria = distanceCriteria
 		self.nodeByTree = nodeByTree
 		self.tempLS = tempLS
 		self.minTemp = minTemp
@@ -40,4 +39,5 @@ class params(object):
 		self.typemut = typemut
 		self.iskb = iskb
 		self.kbProb = kbprob
+		self.distCriLVL = distanceCritLVL
 		

@@ -4,13 +4,13 @@ import copy
 from utils_py.utils import *
 
 class agent(object):
-	def __init__(self, pocketSize, distanceCriteria, ligand, newCenter):
+	def __init__(self, pocketSize, ligand, newCenter, distCritLVL):
 		self.id = 0
 		self.amountSolution = 0
 		self.maxPocket = pocketSize
 		self.current = None
 		self.pocket = [None]*self.maxPocket
-		self.distanceCriteria = distanceCriteria
+		self.distanceCriteria = distCritLVL
 		self.ligand = ligand
 		self.centerSpace = newCenter
 

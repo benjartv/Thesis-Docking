@@ -111,6 +111,10 @@ def setPathMLig(name):
     path = "molecules/m-ligand/"+name.lower()+"-modify.pdbqt"
     return path
 
+def setPathMRLig(name):
+    path = "molecules/m-ligand/"+name.lower()+"-modR.pdbqt"
+    return path
+
 def impProtein(name):
     shutil.copy2("molecules/protein/"+name.upper()+".pdbqt", "temp/protein.pdbqt")
 
@@ -131,6 +135,16 @@ def usage():
 def setAnglesPath(lig):
     path = "molecules/anglesKB/"+str(lig)+"/"
     return path
+
+def readKBfileName(name):
+    archive = open(name+".txt")
+    data = archive.readlines()
+    archive.close()
+    filenames = []
+    for file in data:
+        filenames.append(file.strip())
+    return filenames
+
 
 def configParameters(name):
     params = open("ligands-config.txt", "r")

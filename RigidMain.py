@@ -1,4 +1,4 @@
-from algorithm_py.Memetic import *
+from algorithm_py.MemeticRigid import *
 from objects_py.molecule import *
 from utils_py.params import *
 from utils_py.utils import *
@@ -13,7 +13,8 @@ __protein = __molecules[1]
 
 
 if __name__ == "__main__":
-	anglesPath = setAnglesPath(__ligand)
+	
+
 
 	print "Preparing molecules..."
 	originalLigand = Molecule(__ligand)
@@ -30,15 +31,13 @@ if __name__ == "__main__":
 	print "Complete."
 
 	print "Preparing Ligand...",
-	modligPath = setPathMLig(__ligand)
+	modligPath = setPathMRLig(__ligand)
 	modLigand = Molecule(__ligand)
 	modLigand.readPDBQT(modligPath)
 	modLigand.calculateSegment()
+	modLigand.branch = []
 	print "Complete."
-	if __isKB:
-		print "Import Knowledge Base..."
-		modLigand.importAngles(files, anglesPath)
-		print "Complete."
+
 	print "Set vina configuration...",
 	configParameters(__ligand)
 	print "Complete."	
@@ -46,12 +45,12 @@ if __name__ == "__main__":
 	spaceCenter = originalLigand.findCenter()
 	__searchSpace = 3 #search space for translate center of ligand
 	newSearchSpace = [random.uniform(-__searchSpace,__searchSpace)+spaceCenter[i] for i in range(3)]
-	__generations = 1230 #number of generations until the algorithm stop
+	__generations = 1000 #number of generations until the algorithm stop
 						#1120 for 1.000.000 energy evaluation
 	__pocketSize = 5 #size of the pocket of each agent
 	__treeNodes = 13 #number of nodes of the hierarchical tree
 	__mutProbability = 0.2 #probability of mutation
-	__isLocalSearch = True
+	__isLocalSearch = False
 	__typeCO = 0 #type of Crossover
 	# 0: crossover Uniform
 	# 1: crossover only center
@@ -68,7 +67,7 @@ if __name__ == "__main__":
 	__minTemp = 1.0 #final temperature for simulated annealing (LS)
 	__alphaTemp = 0.9 #alpha for simulated annealing (LS)
 	__numberIteration = 1 #by Local Search loop
-	__reset = 130 #number of generation between each reset (-1 for non reset)
+	__reset = 100 #number of generation between each reset (-1 for non reset)
 	__typeReset = 0 #Type of reset
 	# 0: generation reset
 	# 1: molecule reset
@@ -92,10 +91,10 @@ if __name__ == "__main__":
 						__reset,
 						__typeReset,
 						__typeMut,
-						__isKB,
-						__KBProb)
+						0,
+						0)
 	print "Init memetic algorithm..."
-	Memetic(parameters, modLigand, originalLigand).initProcess()
+	MemeticRigid(parameters, modLigand, originalLigand).initProcess()
 	print "Removing temporal data..."
 	cleanTemp()
 	print "Done."
