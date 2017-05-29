@@ -51,21 +51,21 @@ if __name__ == "__main__":
 	spaceCenter = originalLigand.findCenter()
 	__searchSpace = 3 #search space for translate center of ligand
 	newSearchSpace = [random.uniform(-__searchSpace,__searchSpace)+spaceCenter[i] for i in range(3)]
-	__generations = 1 #number of generations until the algorithm stop
+	__generations = 1240 #number of generations until the algorithm stop
 						#1120 for 1.000.000 energy evaluation
-	__pocketSize = 5 #size of the pocket of each agent
+	__pocketSize = 6 #size of the pocket of each agent
 	__treeNodes = 13 #number of nodes of the hierarchical tree
 	__mutProbability = 0.2 #probability of mutation
 	__isLocalSearch = True
 
-	__typeCO = 1 #type of Crossover
+	__typeCO = 0 #type of Crossover
 	# 0: crossover Uniform
 	# 1: crossover Block
 	# 2: crossover SPC
 	# 3: crossover 50/50
 	# 4: crossover only Center (ONLY for LS 2)
 
-	__typeLS = 2 #type of Local Search
+	__typeLS = 0 #type of Local Search
 	# 0: mutation block
 	# 1: mutation spacereduce by iteration
 	# 2: mutation only Rotation (ONLY for CS 1)
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 	__minTemp = 1.0 #final temperature for simulated annealing (LS)
 	__alphaTemp = 0.9 #alpha for simulated annealing (LS)
 	__numberIteration = 1 #by Local Search loop
-	__reset = 50 #number of generation between each reset (-1 for non reset)
+	__reset = 100 #number of generation between each reset (-1 for non reset)
 	__typeReset = 0 #Type of reset
 	# 0: generation reset
 	# 1: molecule reset

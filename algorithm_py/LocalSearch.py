@@ -42,7 +42,6 @@ class LocalSearch(object):
 				j += 1
 			T *= self.__tempAlpha
 			self.__tempIterative *= self.__alphaIt
-			print self.__tempIterative
 		return copy.deepcopy(oldCell)
 
 	def getNeighbor(self, cell):

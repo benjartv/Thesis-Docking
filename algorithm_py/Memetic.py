@@ -28,6 +28,7 @@ class Memetic(object):
 		self.__leafNode = [None]*self.__nodeByTree*len(self.__fatherNode)
 		
 		self.__logPop = ""
+		self.__logSolution = ""
 		self.__logData = ""
 		self.__numberScoring = 0
 		self.__dirResult = ""
@@ -70,6 +71,7 @@ class Memetic(object):
 			if self.__isReset:
 				self.resetCount(i)
 			print "Generation: ", i, " Best: ", bestNode
+			self.__logSolution += str(bestNode)+"\n"
 			self.addlogPopulation(i)
 			print "Root: ", self.__rootNode.getPocketScore()
 		bestCell = self.__rootNode.getBest()
@@ -579,6 +581,11 @@ class Memetic(object):
 		file.write(logWrite)
 		file.close()
 
+		file = open(self.__dirResult+"/datar.log", "w")
+		logWrite = self.__logSolution
+		file.write(logWrite)
+		file.close()
+
 	def resetCount(self, gen):
 		if gen > self.__bestGeneration:
 			self.__rCount += 1
@@ -594,23 +601,25 @@ class Memetic(object):
 			self.__rCount == 0
 
 	def resetPopulation(self):
+		
 		for node in self.__leafNode:
-			bestCell = node.getBest()
+			#bestCell = node.getBest()
 			node.resetAgent()
-			node.addToPocket(bestCell)
+			#node.addToPocket(bestCell)
 		for node in self.__fatherNode:
-			bestCell = node.getBest()
+			#bestCell = node.getBest()
 			node.resetAgent()
-			node.addToPocket(bestCell)
-		bestCell = self.__rootNode.getBest()
-		self.__rootNode.resetAgent()
-		self.__rootNode.addToPocket(bestCell)
+			#node.addToPocket(bestCell)
+		
+		#bestCell = self.__rootNode.getBest()
+		#self.__rootNode.resetAgent()
+		#self.__rootNode.addToPocket(bestCell)
 
 		if self.__isKB:
-			gene = Gene()
-			gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray, self.__kbProb)
-			gene = self.calculates(gene)
-			self.__rootNode.addToPocket(copy.deepcopy(gene))
+			#gene = Gene()
+			#gene.randomCellKB(len(self.__ligand.branchSegment), self.__searchSpace, self.__ligand.anglesArray, self.__kbProb)
+			#gene = self.calculates(gene)
+			#self.__rootNode.addToPocket(copy.deepcopy(gene))
 
 			for n in range(len(self.__fatherNode)):
 				gene = Gene()
@@ -623,10 +632,10 @@ class Memetic(object):
 				gene = self.calculates(gene)
 				self.__leafNode[n].addToPocket(copy.deepcopy(gene))
 		else:
-			gene = Gene()
-			gene.randomCell(len(self.__ligand.branchSegment), self.__searchSpace)
-			gene = self.calculates(gene)
-			self.__rootNode.addToPocket(copy.deepcopy(gene))
+			#gene = Gene()
+			#gene.randomCell(len(self.__ligand.branchSegment), self.__searchSpace)
+			#gene = self.calculates(gene)
+			#self.__rootNode.addToPocket(copy.deepcopy(gene))
 
 			for n in range(len(self.__fatherNode)):
 				gene = Gene()
