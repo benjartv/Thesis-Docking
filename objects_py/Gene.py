@@ -21,7 +21,8 @@ class Gene:
     	self.y = random.uniform(-searchSpace, searchSpace)
     	self.z = random.uniform(-searchSpace, searchSpace)
     	self.sph_theta = random.uniform(0,2)*math.pi
-    	self.sph_phi = random.uniform(0,1)*math.pi
+    	#self.sph_phi = random.uniform(0,1)*math.pi
+        self.sph_phi = math.acos(2*random.uniform(0,1)-1)
     	self.theta = random.uniform(0,2)*math.pi
     	for i in range(rotateBond):
     		angle = random.uniform(0,2)*math.pi
@@ -32,7 +33,8 @@ class Gene:
         self.y = random.uniform(-searchSpace, searchSpace)
         self.z = random.uniform(-searchSpace, searchSpace)
         self.sph_theta = random.uniform(0,2)*math.pi
-        self.sph_phi = random.uniform(0,1)*math.pi
+        #self.sph_phi = random.uniform(0,1)*math.pi
+        self.sph_phi = math.acos(2*random.uniform(0,1)-1)
         self.theta = random.uniform(0,2)*math.pi
 
     def randomCellKB(self, rotateBond, searchSpace, kbase, prob):
@@ -40,7 +42,8 @@ class Gene:
         self.y = random.uniform(-searchSpace, searchSpace)
         self.z = random.uniform(-searchSpace, searchSpace)
         self.sph_theta = random.uniform(0,2)*math.pi
-        self.sph_phi = random.uniform(0,1)*math.pi
+        #self.sph_phi = random.uniform(0,1)*math.pi
+        self.sph_phi = math.acos(2*random.uniform(0,1)-1)
         self.theta = random.uniform(0,2)*math.pi
         for i in range(rotateBond):
             if random.uniform(0,1) <= prob:

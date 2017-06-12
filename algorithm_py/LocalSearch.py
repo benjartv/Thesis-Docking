@@ -97,7 +97,8 @@ class LocalSearch(object):
 		elif select == 4:
 			cell.sph_theta = random.uniform(0,2)*math.pi
 		elif select == 5:
-			cell.sph_phi = random.uniform(0,1)*math.pi
+			#cell.sph_phi = random.uniform(0,1)*math.pi
+			cell.sph_phi = math.acos(2*random.uniform(0,1)-1)
 		elif select == 6:
 			cell.theta = random.uniform(0,2)*math.pi
 		elif select == 7:
@@ -127,7 +128,8 @@ class LocalSearch(object):
 			if sel2 == 0:
 				cell.sph_theta = random.uniform(0,2)*math.pi
 			elif sel2 == 1:
-				cell.sph_phi = random.uniform(0,1)*math.pi
+				#cell.sph_phi = random.uniform(0,1)*math.pi
+				cell.sph_phi = math.acos(2*random.uniform(0,1)-1)
 			elif sel2 == 2:
 				cell.theta = random.uniform(0,2)*math.pi
 		elif select == 2:
@@ -164,7 +166,8 @@ class LocalSearch(object):
 			if sel2 == 0:
 				cell.sph_theta = random.uniform(0,2)*math.pi
 			elif sel2 == 1:
-				cell.sph_phi = random.uniform(0,1)*math.pi
+				#cell.sph_phi = random.uniform(0,1)*math.pi
+				cell.sph_phi = math.acos(2*random.uniform(0,1)-1)
 			elif sel2 == 2:
 				theta = cell.theta / math.pi
 				if theta > 1:
@@ -210,7 +213,8 @@ class LocalSearch(object):
 		if select == 1:
 			cell.sph_theta = random.uniform(0,2)*math.pi
 		elif select == 2:
-			cell.sph_phi = random.uniform(0,1)*math.pi
+			#cell.sph_phi = random.uniform(0,1)*math.pi
+			cell.sph_phi = math.acos(2*random.uniform(0,1)-1)
 		elif select == 3:
 			cell.theta = random.uniform(0,2)*math.pi
 		elif select == 4:
