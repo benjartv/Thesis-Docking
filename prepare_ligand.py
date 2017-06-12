@@ -9,7 +9,7 @@ import shutil
 import copy
 import math
 
-__namemolecule = "NAD"
+__namemolecule = "AH1"
 __searchSpace = 10
 
 if __name__ == '__main__':
@@ -17,16 +17,22 @@ if __name__ == '__main__':
 	path = setPathLig(__namemolecule)
 	ormolecule.readPDBQT(path)
 	ormolecule.calculateSegment()
+	#print ormolecule.findCenter()
+	for i in ormolecule.branchSegment:
+		print i
 	
 	solution = Gene()
-	solution.rigidRandomCell(__searchSpace)
-	aux = copy.deepcopy(ormolecule)
-	center = aux.findCenter()
-	aux.translateToPoint([center[0]+solution.x,
-						center[1]+solution.y,
-						center[2]+solution.z,])
-	sphVect = spherePoint(1, solution.sph_theta, solution.sph_phi)
-	aux.rotateByVector(sphVect, solution.theta)
+	center = ormolecule.findCenter()
+	newcenter = [random.uniform(-10,10)+center[i] for i in range(3)]
+	solution.randomCell(int(ormolecule.torsdof), 3)
 
-	aux.writePDBQT(__namemolecule.lower()+"_mod.pdbqt")
+	for i in range(len(ormolecule.branch)):
+		ormolecule.rotateAtomsBranch(i, solution.rotateBonds[i])
+	ormolecule.translateToPoint([newcenter[0]+solution.x, 
+								newcenter[1]+solution.y, 
+								newcenter[2]+solution.z])
+	sphVect = spherePoint(1, solution.sph_theta, solution.sph_phi)
+	ormolecule.rotateByVector(sphVect, solution.theta)
+	
+	ormolecule.writePDBQT(__namemolecule.lower()+"_mod.pdbqt")
 	
