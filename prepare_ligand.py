@@ -9,7 +9,7 @@ import shutil
 import copy
 import math
 
-__namemolecule = "AH1"
+__namemolecule = "NAD"
 __searchSpace = 10
 
 if __name__ == '__main__':
@@ -17,7 +17,13 @@ if __name__ == '__main__':
 	path = setPathLig(__namemolecule)
 	ormolecule.readPDBQT(path)
 	ormolecule.calculateSegment()
+
+
+	ligmol = Molecule()
+	ligmol.readPDBQT("lig1.pdbqt")
+	print getRMSD2(ligmol, ormolecule)
 	#print ormolecule.findCenter()
+	'''
 	for i in ormolecule.branchSegment:
 		print i
 	
@@ -35,4 +41,4 @@ if __name__ == '__main__':
 	ormolecule.rotateByVector(sphVect, solution.theta)
 	
 	ormolecule.writePDBQT(__namemolecule.lower()+"_mod.pdbqt")
-	
+	'''

@@ -31,11 +31,18 @@ def calcRotM(vector, theta):
 
         return rot
 
-def getRMSD(ligand1, ligand2):
+def getRMSD2(ligand1, ligand2):
     dist = 0
     for i in range(len(ligand1.x)):
         dist += math.sqrt( (float(ligand1.x[i])-float(ligand2.x[i]))**2 + (float(ligand1.y[i])-float(ligand2.y[i]))**2 + (float(ligand1.z[i])-float(ligand2.z[i]))**2 )
     rmsd = dist / len(ligand1.x)
+    return rmsd
+
+def getRMSD(ligand1, ligand2):
+    dist = 0
+    for i in range(len(ligand1.x)):
+        dist +=  (float(ligand1.x[i])-float(ligand2.x[i]))**2 + (float(ligand1.y[i])-float(ligand2.y[i]))**2 + (float(ligand1.z[i])-float(ligand2.z[i]))**2 
+    rmsd = math.sqrt(dist / len(ligand1.x))
     return rmsd
 
 def spherePoint(radius, theta, phi):
