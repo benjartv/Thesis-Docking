@@ -1,6 +1,7 @@
 import copy
 import math
 from objects_py.molecule import *
+from objects_py.Gene import *
 from utils_py.utils import *
 
 class LocalSearch(object):
@@ -31,21 +32,23 @@ class LocalSearch(object):
 		#print "Init Local Search..."
 		self.__tempIterative = 1.0
 		T = self.__temp
-		oldCell = copy.deepcopy(cell)
+		oldCell = Gene()
+		oldCell.copyGene(cell)
 		while T > self.__tempMin:
 			j = 1
 			while j <= self.__numIteration:
 				newCell = self.getNeighbor(oldCell)
 				criteria = self.accptance(oldCell, newCell, T)
 				if criteria > random.random():
-					oldCell = copy.deepcopy(newCell)
+					oldCell.copyGene(newCell)
 				j += 1
 			T *= self.__tempAlpha
 			self.__tempIterative *= self.__alphaIt
-		return copy.deepcopy(oldCell)
+		return oldCell
 
 	def getNeighbor(self, cell):
-		newCell = copy.deepcopy(cell)
+		newCell = Gene()
+		newCell.copyGene(cell)
 		if self.__typeLS == 0:
 			newCell = self.mutationBlock(newCell)
 		elif self.__typeLS == 1:
@@ -54,7 +57,7 @@ class LocalSearch(object):
 		elif self.__typeLS == 2:
 			newCell = self.mutationRot(newCell)
 		newCell = self.calculates(newCell)
-		return copy.deepcopy(newCell)
+		return newCell
 
 	def accptance(self, oldCell, newCell, temp):
 		oldScore = oldCell.score
@@ -84,7 +87,7 @@ class LocalSearch(object):
 		auxLigand.writePDBQT(self.__temporalDir+"ligand.pdbqt")
 		cell.score = calculateFreeEnergy()
 		self.__numberScoring += 1
-		return copy.deepcopy(cell)
+		return cell
 
 	def mutation(self, cell):
 		select = random.randint(1, 7)
@@ -111,7 +114,7 @@ class LocalSearch(object):
 					cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 			else:
 				cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
-		return copy.deepcopy(cell)
+		return cell
 
 	def mutationBlock(self, cell):
 		select = random.randint(0,2)
@@ -227,7 +230,7 @@ class LocalSearch(object):
 					cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
 			else:
 				cell.rotateBonds[pos] = random.uniform(0,2)*math.pi
-		return copy.deepcopy(cell)
+		return cell
 
 	def getNumberEvaluation(self):
 		return self.__numberScoring

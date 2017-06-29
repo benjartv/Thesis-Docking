@@ -16,6 +16,16 @@ class Gene:
         self.rotateBonds = []
         self.score = 0.0
 
+    def copyGene(self, cell):
+        self.x = cell.x
+        self.y = cell.y
+        self.z = cell.z
+        self.sph_theta = cell.sph_theta
+        self.sph_phi = cell.sph_phi
+        self.theta = cell.theta
+        self.rotateBonds = cell.rotateBonds[:]
+        self.score = cell.score
+
     def randomCell(self, rotateBond, searchSpace):
     	self.x = random.uniform(-searchSpace, searchSpace)
     	self.y = random.uniform(-searchSpace, searchSpace)
