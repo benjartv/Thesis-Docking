@@ -20,8 +20,8 @@ if __name__ == '__main__':
 
 
 	ligmol = Molecule()
-	ligmol.readPDBQT("lig1.pdbqt")
-	print getRMSD2(ligmol, ormolecule)
+	ligmol.readPDBQT("ligand_1.pdbqt")
+	print getRMSD(ligmol, ormolecule)
 	#print ormolecule.findCenter()
 	'''
 	for i in ormolecule.branchSegment:

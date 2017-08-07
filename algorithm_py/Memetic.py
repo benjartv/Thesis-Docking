@@ -284,7 +284,16 @@ class Memetic(object):
 				self.__leafNode[self.__nodeByTree*i+j].addToPocket(npop)
 			pop1 = self.__rootNode.getRandom()
 			pop2 = self.__fatherNode[i].getRandom()
-			npop = self.crossoverUniform(pop1, pop2)
+			if self.__typeCO == 0:
+				npop = self.crossoverUniform(pop1, pop2)
+			elif self.__typeCO == 1:
+				npop = self.crossoverBlock(pop1, pop2)
+			elif self.__typeCO == 2:
+				npop = self.crossoverSPC(pop1, pop2)
+			elif self.__typeCO == 3:
+				npop = self.crossover50(pop1, pop2)
+			elif self.__typeCO == 4:
+				npop = self.crossoverCenter(pop1, pop2)
 			npop = self.mutation(npop)
 			npop = self.calculates(npop)
 			self.__fatherNode[i].addToPocket(npop)
@@ -630,7 +639,7 @@ class Memetic(object):
 					self.resetMolecule()
 				self.__rCount = 0
 		else:
-			self.__rCount == 0
+			self.__rCount = 0
 
 	def resetPopulation(self):
 		
