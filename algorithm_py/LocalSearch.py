@@ -21,6 +21,9 @@ class LocalSearch(object):
 		self.__kbProb = kbprob
 		self.__tempIterative = 1.0
 		self.__alphaIt = None
+		self.__normalLSCount = 0
+		self.__redLSCount = 0
+		self.__rotLSCount = 0
 
 		self.setAlphaIt()
 
@@ -46,6 +49,19 @@ class LocalSearch(object):
 			self.__tempIterative *= self.__alphaIt
 		return oldCell
 
+	# def getNeighbor(self, cell):
+	# 	newCell = Gene()
+	# 	newCell.copyGene(cell)
+	# 	if self.__typeLS == 0:
+	# 		newCell = self.mutationBlock(newCell)
+	# 	elif self.__typeLS == 1:
+	# 		alpha = self.__tempIterative
+	# 		newCell = self.mutationReduce(newCell, alpha)
+	# 	elif self.__typeLS == 2:
+	# 		newCell = self.mutationRot(newCell)
+	# 	newCell = self.calculates(newCell)
+	# 	return newCell
+
 	def getNeighbor(self, cell):
 		newCell = Gene()
 		newCell.copyGene(cell)
@@ -56,6 +72,30 @@ class LocalSearch(object):
 			newCell = self.mutationReduce(newCell, alpha)
 		elif self.__typeLS == 2:
 			newCell = self.mutationRot(newCell)
+		elif self.__typeLS == 3:
+			localOpt = random.randint(1,3)
+			if localOpt == 1:
+				newCell = self.mutationBlock(newCell)
+				self.__normalLSCount+=1
+			elif localOpt == 2:
+				alpha = self.__tempIterative
+				newCell = self.mutationReduce(newCell, alpha)
+				self.__redLSCount+=1
+			elif localOpt == 3:
+				newCell = self.mutationRot(newCell)
+				self.__rotLSCount+=1
+		elif self.__typeLS == 4:
+			localOpt = random.uniform(0,1)
+			if localOpt <= 0.1:
+				newCell == self.mutationBlock(newCell)
+				self.__normalLSCount+=1
+			elif localOpt <= 0.35:
+				alpha = self.__tempIterative
+				newCell = self.mutationReduce(newCell, alpha)
+				self.__redLSCount+=1
+			elif localOpt > 0.35:
+				newCell == self.mutationRot(newCell)
+				self.__rotLSCount+=1
 		newCell = self.calculates(newCell)
 		return newCell
 
@@ -234,6 +274,15 @@ class LocalSearch(object):
 
 	def getNumberEvaluation(self):
 		return self.__numberScoring
+
+	def getTypeLS(self):
+		return self.__typeLS
+
+	def getCountLS(self):
+		normalCount = self.__normalLSCount
+		redCount = self.__redLSCount
+		rotCount = self.__rotLSCount
+		return [normalCount, redCount, rotCount]
 
 	def setAlphaIt(self):
 		alpha = self.__tempAlpha

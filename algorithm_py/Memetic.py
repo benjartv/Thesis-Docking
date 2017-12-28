@@ -121,6 +121,13 @@ class Memetic(object):
 		self.__logData += "Time: "+ str(self.__Time)+"\n"
 		self.__logData += "Number of Energy Evaluation: "+ str(self.__numberScoring)+"\n"
 
+		if self.__isLocalSearch:
+			if self.__LocalSearch.getTypeLS() > 2:
+				LSCount = self.__LocalSearch.getCountLS()
+				self.__logData += "Normal LS: "+ str(LSCount[0]) +"\n"
+				self.__logData += "Reduction LS: "+ str(LSCount[1]) +"\n"
+				self.__logData += "Rotation LS: "+ str(LSCount[2]) +"\n"
+
 		print "Process complete"
 		self.writeLog()
 
